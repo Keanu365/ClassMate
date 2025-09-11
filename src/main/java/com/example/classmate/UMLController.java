@@ -7,6 +7,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 
 public class UMLController extends Controller{
 
@@ -34,9 +35,11 @@ public class UMLController extends Controller{
     @FXML
     private Button instructionsBtn;
 
-    @FXML
-    void generate(MouseEvent event) {
+    static UMLClass[] umlClasses;
 
+    @FXML
+    void generate(MouseEvent event) throws IOException {
+        showScene(new Stage(), "ClassMate - UML Diagram Editor", "/com/example/classmate/View/uml-editor-view.fxml");
     }
 
     @FXML
@@ -50,7 +53,7 @@ public class UMLController extends Controller{
                 File[] files = folder.listFiles();
                 if (files == null || files.length == 0) throw new Exception("Provided folder is empty.");
                 Class<?>[] classes = UMLClass.loadFolder(folder);
-                UMLClass[] umlClasses = new UMLClass[classes.length];
+                umlClasses = new UMLClass[classes.length];
                 for (int i = 0; i < classes.length; i++) {
                     umlClasses[i] = new  UMLClass(classes[i]);
                 }

@@ -28,4 +28,10 @@ public class DraggableMaker {
             node.setTranslateY(mouseEvent.getSceneY() - mouseAnchorY);
         });
     }
+
+    public static void reset(Node node){
+        node.setOnMouseReleased(null);
+        node.setOnMousePressed(null);
+        node.setOnMouseDragged(null);
+    }
 }

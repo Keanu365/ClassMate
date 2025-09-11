@@ -47,20 +47,15 @@ public class UMLClass {
 
     //By default, getMethods() will return declared methods only, unless declaredOnly is set to false.
     public String getMethods(){
-        String output = "";
-        Method[] methods = this.c.getDeclaredMethods();
-        for (Method m : methods) {
-            output += getLine(m, this.simpleNames) + "\n";
-        }
-        return output;
+       return getMethods(true);
     }
-
     public String getMethods(boolean declaredOnly){
         String output = "";
         Method[] methods;
         if (declaredOnly) methods = this.c.getDeclaredMethods();
         else methods = this.c.getMethods();
         for (Method m : methods) {
+            if (m.isSynthetic()) continue;
             output += getLine(m, this.simpleNames) + "\n";
         }
         return output;
