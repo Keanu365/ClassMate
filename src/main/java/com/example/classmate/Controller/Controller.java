@@ -1,4 +1,4 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Duration;

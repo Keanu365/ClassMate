@@ -1,17 +1,13 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -32,7 +28,7 @@ public class MainController extends Controller{
     void loadAiScene(MouseEvent event) throws IOException {
         Node source = (Node)event.getSource();
         Scene scene = source.getScene();
-        scene.getStylesheets().add(getClass().getResource("View/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/com/example/classmate/View/styles.css").toExternalForm());
         Stage stage = (Stage)scene.getWindow();
         fadeScene(scene, 1);
         showScene(stage, "ClassMate - AI Buddy", "/com/example/classmate/View/ai-view.fxml");
@@ -42,7 +38,7 @@ public class MainController extends Controller{
     void loadUMLScene(MouseEvent event) throws IOException {
         Node source = (Node)event.getSource();
         Scene scene = source.getScene();
-        scene.getStylesheets().add(getClass().getResource("View/styles.css").toExternalForm());
+        scene.getStylesheets().add(getClass().getResource("/com/example/classmate/View/styles.css").toExternalForm());
         Stage stage = (Stage)scene.getWindow();
         fadeScene(scene, 1);
         showScene(stage, "ClassMate - UML Diagram Generator", "/com/example/classmate/View/uml-view.fxml");

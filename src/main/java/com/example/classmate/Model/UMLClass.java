@@ -1,6 +1,5 @@
-package com.example.classmate;
+package com.example.classmate.Model;
 
-import javax.tools.*;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -152,7 +151,7 @@ public class UMLClass {
     //Setting original folder
     private static int recursionCounter = 0;
     private static File rootFolder;
-    static Class<?>[] loadFolder(File folder) throws Exception{
+    public static Class<?>[] loadFolder(File folder) throws Exception{
         recursionCounter++;
         if (recursionCounter == 1) rootFolder = folder;
         File[] files = folder.listFiles();

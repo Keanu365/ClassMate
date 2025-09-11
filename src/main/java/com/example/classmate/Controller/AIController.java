@@ -1,4 +1,4 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

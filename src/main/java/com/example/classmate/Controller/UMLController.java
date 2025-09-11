@@ -1,5 +1,6 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
+import com.example.classmate.Model.UMLClass;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;

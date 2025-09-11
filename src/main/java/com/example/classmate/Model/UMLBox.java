@@ -1,4 +1,4 @@
-package com.example.classmate;
+package com.example.classmate.Model;
 
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;

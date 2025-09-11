@@ -1,5 +1,6 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
+import com.example.classmate.Model.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -20,7 +21,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
 import java.io.*;
