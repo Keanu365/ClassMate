@@ -11,4 +11,8 @@ module com.example.classmate {
 
     opens com.example.classmate to javafx.fxml;
     exports com.example.classmate;
+    exports com.example.classmate.Model;
+    opens com.example.classmate.Model to javafx.fxml;
+    exports com.example.classmate.Controller;
+    opens com.example.classmate.Controller to javafx.fxml;
 }

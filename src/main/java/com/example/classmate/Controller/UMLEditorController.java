@@ -1,5 +1,6 @@
-package com.example.classmate;
+package com.example.classmate.Controller;
 
+import com.example.classmate.Model.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -20,7 +21,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.layout.VBox;
 
 import javax.imageio.ImageIO;
 import java.io.*;
@@ -92,6 +92,7 @@ public class UMLEditorController extends Controller{
 
         Collections.addAll(modeToggles, selectToggle, moveToggle, panToggle,  editTextToggle, resizeToggle);
         umlBoxLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new UMLBox()));
+        arrowLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new PolyArrow()));
         editMode = EditMode.SELECT;
         selectToggle.setSelected(true);
         setEditMode(editMode);

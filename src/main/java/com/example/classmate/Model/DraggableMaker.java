@@ -1,7 +1,6 @@
-package com.example.classmate;
+package com.example.classmate.Model;
 
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 
 public class DraggableMaker {
     private double mouseAnchorX;

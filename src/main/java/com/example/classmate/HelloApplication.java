@@ -10,7 +10,7 @@ import java.io.IOException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("View/uml-editor-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("View/main-menu.fxml"));
         Scene scene = new Scene(fxmlLoader.load()/*, 400, 600*/);
         stage.setTitle("ClassMate");
         stage.setScene(scene);

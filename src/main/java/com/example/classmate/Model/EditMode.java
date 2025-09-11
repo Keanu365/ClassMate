@@ -1,13 +1,13 @@
-package com.example.classmate;
+package com.example.classmate.Model;
 
-enum EditMode {
+public enum EditMode {
     SELECT,
     MOVE,
     PAN,
     EDIT_TEXT,
     RESIZE;
 
-    static EditMode[] getEditModes(){
+    public static EditMode[] getEditModes(){
         return new EditMode[]{SELECT,MOVE,PAN,EDIT_TEXT,RESIZE};
     }
 }
