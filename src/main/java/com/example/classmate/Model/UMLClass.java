@@ -22,7 +22,7 @@ public class UMLClass {
     }
 
     public String getName(){
-        return this.c.getCanonicalName() + getParameters(this.c.getTypeParameters());
+        return this.c.getCanonicalName() + getParameters(this.c.getTypeParameters()) + (this.c.isInterface() ? "\n<<interface>>" : "");
     }
 
     public String getFields(){
@@ -103,7 +103,7 @@ public class UMLClass {
             outputLine += ")";
             if (obj instanceof Method m) outputLine += ": " + m.getReturnType().getTypeName() + getParameters(m.getReturnType(), m.getGenericReturnType());
         }else throw new IllegalArgumentException(); //Must be field or method
-        //if (isStatic){}; //TODO: future work
+        if (isStatic) outputLine = "(static)" + outputLine;
         return outputLine;
     }
 

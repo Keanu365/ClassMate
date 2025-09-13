@@ -2,6 +2,9 @@ package com.example.classmate.Controller;
 
 import com.example.classmate.Model.UMLClass;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
@@ -40,7 +43,18 @@ public class UMLController extends Controller{
 
     @FXML
     void generate(MouseEvent event) throws IOException {
-        showScene(new Stage(), "ClassMate - UML Diagram Editor", "/com/example/classmate/View/uml-editor-view.fxml");
+        Stage stage = new Stage();
+        stage.setTitle("ClassMate - UML Diagram Editor");
+        stage.getIcons().add(new javafx.scene.image.Image("file:" + System.getProperty("user.dir") + "/src/main/resources/com/example/classmate/View/icon.png"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/classmate/View/uml-editor-view.fxml"));
+        Parent root = loader.load();
+        UMLEditorController controller = loader.getController();
+
+        Scene scene = new Scene(root);
+        scene.setUserData(controller);
+
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML
@@ -57,10 +71,6 @@ public class UMLController extends Controller{
                 umlClasses = new UMLClass[classes.length];
                 for (int i = 0; i < classes.length; i++) {
                     umlClasses[i] = new  UMLClass(classes[i]);
-                }
-                //Placeholder code for future work
-                for (UMLClass uc : umlClasses){
-                    System.out.println(uc);
                 }
             }catch (Exception e){
                 e.printStackTrace();

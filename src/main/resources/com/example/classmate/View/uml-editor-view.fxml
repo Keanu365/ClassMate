@@ -3,8 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.effect.Bloom?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -19,7 +21,7 @@
 <?import javafx.scene.paint.Stop?>
 <?import javafx.scene.text.Font?>
 
-<GridPane fx:id="gridPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#checkKeyPress" prefHeight="400.0" prefWidth="600.0" styleClass="bg" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.classmate.Controller.UMLEditorController">
+<GridPane fx:id="gridPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#checkKeyPress" prefHeight="800.0" prefWidth="1200.0" styleClass="bg" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.classmate.Controller.UMLEditorController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
    </columnConstraints>
@@ -78,7 +80,7 @@
       </HBox>
       <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
          <children>
-            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" hvalue="0.5" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" pannable="true" prefWidth="450.0" vbarPolicy="NEVER" vvalue="0.5" StackPane.alignment="CENTER_RIGHT">
+            <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" hvalue="0.5" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" pannable="true" prefWidth="1050.0" vbarPolicy="NEVER" vvalue="0.5" StackPane.alignment="CENTER_RIGHT">
                <StackPane.margin>
                   <Insets bottom="10.0" left="160.0" right="10.0" top="10.0" />
                </StackPane.margin>
@@ -122,6 +124,69 @@
                                  <cursor>
                                     <Cursor fx:constant="SE_RESIZE" />
                                  </cursor></ToggleButton>
+                           </children>
+                        </VBox>
+                        <Label fx:id="propertiesLbl" styleClass="label2" text="Properties" visible="false">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Label>
+                        <VBox fx:id="propBox1" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
+                           <children>
+                              <Label styleClass="label1" text="Border/Stroke Color:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <ColorPicker fx:id="borderColorPicker" minHeight="-Infinity">
+                                 <value>
+                                    <Color />
+                                 </value>
+                              </ColorPicker>
+                              <Label layoutX="47.0" layoutY="45.0" styleClass="label1" text="Border/Stroke Width:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="borderWidthField" prefWidth="30.0" />
+                                    <Label style="-fx-text-fill: white;" text="px">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox fx:id="propBox2" alignment="TOP_CENTER" layoutX="10.0" layoutY="338.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
+                           <children>
+                              <Label styleClass="label1" text="Font Color:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <ColorPicker fx:id="fontColorPicker" minHeight="-Infinity">
+                                 <value>
+                                    <Color />
+                                 </value>
+                              </ColorPicker>
+                              <Label styleClass="label1" text="Font Size:">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                                 <children>
+                                    <TextField fx:id="fontSizeField" prefWidth="30.0" />
+                                    <Label style="-fx-text-fill: white;" text="px">
+                                       <font>
+                                          <Font size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
                      </children>

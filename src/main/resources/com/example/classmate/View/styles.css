@@ -67,8 +67,11 @@
     -fx-border-width: 1px;
     -fx-padding: 5px 5px 5px 5px;
     -fx-control-inner-background: transparent;
-    -fx-text-fill: black;
     -fx-font-size: 12px;
+}
+
+.styled-text-area .text{
+    -fx-fill: black;
 }
 
 .toggle_button{

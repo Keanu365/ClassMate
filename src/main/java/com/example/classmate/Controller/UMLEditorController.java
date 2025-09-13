@@ -11,20 +11,25 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleButton;
+import org.fxmisc.richtext.InlineCssTextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 
 public class UMLEditorController extends Controller{
 
@@ -48,6 +53,21 @@ public class UMLEditorController extends Controller{
 
     @FXML
     private GridPane gridPane;
+
+    @FXML
+    private ColorPicker borderColorPicker;
+    @FXML
+    private TextField borderWidthField;
+    @FXML
+    private ColorPicker fontColorPicker;
+    @FXML
+    private TextField fontSizeField;
+    @FXML
+    private VBox propBox1;
+    @FXML
+    private VBox propBox2;
+    @FXML
+    private Label propertiesLbl;
 
     @FXML
     private ToggleButton selectToggle;
@@ -74,7 +94,6 @@ public class UMLEditorController extends Controller{
         });
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
-        dm.makeDraggable(arrowLbl, true);
         contentPane.setPrefSize(100000, 100000);
 
         int counter = 1;
@@ -193,32 +212,87 @@ public class UMLEditorController extends Controller{
         switch(editMode){
             case SELECT:
                 scrollPane.setCursor(Cursor.DEFAULT);
-                modeChanger(false, false, false); break;
-                //TODO: Code for being able to edit color and whatnot
+                modeChanger(false, false, false, true); break;
             case MOVE:
                 scrollPane.setCursor(Cursor.MOVE);
-                modeChanger(false, true, false); break;
+                modeChanger(false, true, false, false); break;
             case PAN:
                 scrollPane.setCursor(Cursor.OPEN_HAND);
-                modeChanger(true, false, false); break;
+                modeChanger(true, false, false, false); break;
             case EDIT_TEXT:
                 scrollPane.setCursor(Cursor.TEXT);
-                modeChanger(true, false, true); break;
+                modeChanger(true, false, true, false); break;
             case RESIZE:
                 scrollPane.setCursor(Cursor.SE_RESIZE);
-                modeChanger(false, false, false); //TODO: WORK ON THIS
+                modeChanger(false, false, false, false); //TODO: WORK ON THIS
             default: break;
         }
     }
-    private void modeChanger(boolean pannable, boolean draggable, boolean editable){
+    private void modeChanger(boolean pannable, boolean draggable, boolean editable, boolean selectable){
         scrollPane.setPannable(pannable);
+        propertiesLbl.setVisible(selectable);
+        propBox1.setVisible(false);
+        propBox2.setVisible(false);
         List<Node> nodes = contentPane.getChildren();
         for (Node node : nodes) {
             if (node instanceof UMLBox umlBox){
                 if (draggable) new DraggableMaker().makeDraggable(umlBox);
                 else DraggableMaker.reset(umlBox);
                 umlBox.setEditable(editable);
+                umlBox.setSelectable(selectable);
             }
+        }
+    }
+
+    public void showProperties(Node node, boolean showBox1, boolean showBox2){
+        //showBox1 will practically always be true anyway.
+        if (!(showBox1 || showBox2)) return;
+        propBox1.setVisible(showBox1);
+        propBox2.setVisible(showBox2);
+        if (node instanceof UMLBox umlBox){
+            BorderStroke strokes = umlBox.getBorder().getStrokes().getFirst();
+            borderColorPicker.setValue((Color) strokes.getTopStroke());
+            borderWidthField.setText(strokes.getWidths().getTop() * 1 + "");
+            InlineCssTextArea textArea = (InlineCssTextArea) umlBox.getChildrenUnmodifiable().getFirst();
+            fontColorPicker.setValue(umlBox.getFontColor());
+            //Find font size
+            int start = textArea.getStyle().lastIndexOf("-fx-font-size:") + 14;
+            int end = textArea.getStyle().indexOf("p", start); //We will always be using px
+            fontSizeField.setText(Double.parseDouble(textArea.getStyle().substring(start, end).replace(" ","")) + "");
+            borderColorPicker.setOnAction(e -> {
+                Color newColor = borderColorPicker.getValue();
+                String css = String.format("rgb(%d,%d,%d);",
+                        (int)(newColor.getRed() * 255),
+                        (int)(newColor.getGreen() * 255),
+                        (int)(newColor.getBlue() * 255));
+                umlBox.setStyle(umlBox.getStyle() + "; -fx-border-color: " + css);
+            });
+            borderWidthField.setOnAction(e -> {
+                try {
+                    double borderWidth = Double.parseDouble(borderWidthField.getText());
+                    System.out.println(borderWidth);
+                    umlBox.setStyle(umlBox.getStyle() + "; -fx-border-width: " + borderWidth + "px");
+                } catch (NumberFormatException ex) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                }
+            });
+            fontColorPicker.setOnAction(e -> {
+                Color newColor = fontColorPicker.getValue();
+                umlBox.setFontColor(newColor);
+            });
+            fontSizeField.setOnAction(e -> {
+                try {
+                    double size = Double.parseDouble(fontSizeField.getText());
+                    for (Node n: umlBox.getChildren()){
+                        InlineCssTextArea ta = (InlineCssTextArea) n;
+                        ta.setStyle(ta.getStyle() + "; -fx-font-size: " + size + "px");
+                        int lines = ta.getText().split("\\n").length;
+                        ta.setPrefHeight(Math.max(1, lines) * UMLBox.getFontSize(textArea) * 2.5);// + 2 * umlBox.getBorderWidth());
+                    }
+                } catch (NumberFormatException ex) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                }
+            });
         }
     }
 }

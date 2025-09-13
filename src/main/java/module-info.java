@@ -7,6 +7,7 @@ module com.example.classmate {
     requires javafx.base;
     requires java.desktop;
     requires javafx.swing;
+    requires org.fxmisc.richtext;
 
 
     opens com.example.classmate to javafx.fxml;
