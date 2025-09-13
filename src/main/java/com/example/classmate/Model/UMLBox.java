@@ -1,11 +1,14 @@
 package com.example.classmate.Model;
 
 import com.example.classmate.Controller.UMLEditorController;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.util.Pair;
 import org.fxmisc.richtext.InlineCssTextArea;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,29 +34,33 @@ public class UMLBox extends VBox implements Selectable{
         this.setStyle("-fx-pref-width: 200px; -fx-border-color: black");
         //Text stuff :3
         String[] texts = new String[]{name, fields, methods};
-        for (String text : texts) {
-            InlineCssTextArea textArea = new InlineCssTextArea();
-            textArea.replaceText(text);
-            textArea.getStyleClass().add("uml_label");
-            textArea.setStyle("-fx-font-size: 12px;");
-            String[] lines = text.split("\\n");
-            while (textArea.getText().contains("(static)")) {
-                int start = textArea.getText().indexOf("(static)");
-                textArea.replaceText(textArea.getText().replaceFirst("\\(static\\)", ""));
-                int end = textArea.getText().indexOf("\n", start);
-                textArea.setStyle(start, end, "-fx-underline: true;");
+            for (String text : texts) {
+                InlineCssTextArea textArea = new InlineCssTextArea();
+                textArea.replaceText(text);
+                textArea.getStyleClass().add("uml_label");
+                textArea.setStyle("-fx-font-size: 12px;");
+                String[] lines = text.split("\\n");
+                List<int[]> list = new ArrayList<>();
+                while (textArea.getText().contains("(static)")) {
+                    int start = textArea.getText().indexOf("(static)");
+                    textArea.replaceText(textArea.getText().replaceFirst("\\(static\\)", ""));
+                    int end = textArea.getText().indexOf("\n", start);
+                    list.add(new int[]{start,end});
+                }
+                for (int[] i : list) {
+                    textArea.setStyle(i[0], i[1], "-fx-underline: true;");
+                }
+                textArea.setPrefHeight(Math.max(1, lines.length) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
+                textArea.borderProperty().bind(this.borderProperty());
+                textArea.prefWidthProperty().bind(this.prefWidthProperty());
+                textArea.setWrapText(true);
+                this.getChildren().add(textArea);
+                textArea.textProperty().addListener((obs, oldText, newText) -> {
+                    int newLines = newText.split("\\n").length;
+                    textArea.setPrefHeight(Math.max(1, newLines) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
+                });
             }
-            textArea.setPrefHeight(Math.max(1, lines.length) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
-            textArea.borderProperty().bind(this.borderProperty());
-            textArea.prefWidthProperty().bind(this.prefWidthProperty());
-            textArea.setWrapText(true);
-            this.getChildren().add(textArea);
-            textArea.textProperty().addListener((obs, oldText, newText) -> {
-                int newLines = newText.split("\\n").length;
-                textArea.setPrefHeight(Math.max(1, newLines) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
-            });
-        }
-        new DraggableMaker().makeDraggable(this);
+            new DraggableMaker().makeDraggable(this);
     }
 
     public void setEditable(boolean editable){
