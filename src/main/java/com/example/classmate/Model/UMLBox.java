@@ -1,18 +1,18 @@
 package com.example.classmate.Model;
 
 import com.example.classmate.Controller.UMLEditorController;
-import javafx.application.Platform;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.util.Pair;
 import org.fxmisc.richtext.InlineCssTextArea;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class UMLBox extends VBox implements Selectable{
+public class UMLBox extends VBox implements Selectable, Resizable {
     public Color fontColor = Color.BLACK;
 
     public UMLBox() {
@@ -50,14 +50,13 @@ public class UMLBox extends VBox implements Selectable{
                 for (int[] i : list) {
                     textArea.setStyle(i[0], i[1], "-fx-underline: true;");
                 }
-                textArea.setPrefHeight(Math.max(1, lines.length) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
+                this.updatePrefHeight();
                 textArea.borderProperty().bind(this.borderProperty());
-                textArea.prefWidthProperty().bind(this.prefWidthProperty());
+                textArea.prefWidthProperty().bindBidirectional(this.prefWidthProperty());
                 textArea.setWrapText(true);
                 this.getChildren().add(textArea);
                 textArea.textProperty().addListener((obs, oldText, newText) -> {
-                    int newLines = newText.split("\\n").length;
-                    textArea.setPrefHeight(Math.max(1, newLines) * getFontSize(textArea) * 2.5);// + 2 * this.getBorderWidth());
+                    this.updatePrefHeight();
                 });
             }
             new DraggableMaker().makeDraggable(this);
@@ -70,7 +69,6 @@ public class UMLBox extends VBox implements Selectable{
             textArea.setMouseTransparent(!editable);
         }
     }
-    public boolean isEditable(){return ((InlineCssTextArea) this.getChildren().getFirst()).isEditable();}
 
     public void setSelectable(boolean selectable){
         if (!selectable) this.setOnMouseClicked(_ -> {});
@@ -79,9 +77,46 @@ public class UMLBox extends VBox implements Selectable{
         }
     }
 
+    public void setResizable(boolean resizable){
+        if (!resizable) {
+            for (Node node : this.getChildren()){
+                node.setOnMouseMoved(_ -> {});
+            }
+        }
+        else {
+            resize();
+        }
+    }
+
     public void select(){
         UMLEditorController controller = (UMLEditorController) this.getScene().getUserData();
         controller.showProperties(this, true, true);
+    }
+
+    public void resize(){
+        //TODO: WORK ON THIS
+        for (Node node : this.getChildren()){
+            //InlineCssTextArea textArea = (InlineCssTextArea) node;
+            node.setOnMouseMoved(event -> handleMouseMoved(node, event));
+        }
+    }
+
+    private void handleMouseMoved(Node node, MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
+        double w = this.getWidth();
+        double h = this.getHeight();
+
+        double margin = 5; // px threshold for borders
+
+        if (x < margin || x > w - margin) {
+            System.out.println("ew border");
+        }else if (y < margin || y > h - margin){
+            System.out.println("ns border");
+        }
+        else {
+            System.out.println("no border");
+        }
     }
 
     public Color getFontColor(){return this.fontColor;}
@@ -104,5 +139,33 @@ public class UMLBox extends VBox implements Selectable{
     }
     public double getBorderWidth(){
         return this.getBorder().getStrokes().getFirst().getWidths().getTop();
+    }
+
+    public void updatePrefHeight(){this.updatePrefHeight(this.getBorderWidth());}
+    public void updatePrefHeight(double borderWidth){ //Required to accommodate for UMLEditorController:274
+        for (Node n : this.getChildren()){
+            InlineCssTextArea textArea = (InlineCssTextArea) n;
+            int lines = textArea.getText().split("\\n").length;
+            textArea.setPrefHeight(Math.max(1, lines) * getFontSize(textArea) * 2.5 + 2 * borderWidth);
+        }
+    }
+
+    public Point2D getTopMiddlePoint(){
+        Bounds bounds = this.getBoundsInLocal();
+        return this.getParent().sceneToLocal(
+                this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY())
+        );
+    }
+    public Point2D getBottomMiddlePoint(){
+        Bounds bounds = this.getBoundsInLocal();
+        return this.getParent().sceneToLocal(
+                this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMaxY())
+        );
+    }
+    public Point2D getMiddlePoint(){
+        return new Point2D(
+                this.getTopMiddlePoint().getX(),
+                (this.getTopMiddlePoint().getY() + this.getBottomMiddlePoint().getY()) / 2.0
+        );
     }
 }

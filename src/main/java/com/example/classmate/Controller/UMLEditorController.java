@@ -15,6 +15,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.KeyCode;
 import org.fxmisc.richtext.InlineCssTextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
@@ -23,10 +24,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -53,6 +52,12 @@ public class UMLEditorController extends Controller{
 
     @FXML
     private GridPane gridPane;
+
+    @FXML
+    private Button delBtn;
+
+    @FXML
+    private StackPane stackPane;
 
     @FXML
     private ColorPicker borderColorPicker;
@@ -94,7 +99,8 @@ public class UMLEditorController extends Controller{
         });
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
-        contentPane.setPrefSize(100000, 100000);
+        //dm.makeDraggable(arrowLbl, true);
+        contentPane.setPrefSize(10000, 10000);
 
         int counter = 1;
         if (UMLController.umlClasses != null) {
@@ -111,7 +117,7 @@ public class UMLEditorController extends Controller{
 
         Collections.addAll(modeToggles, selectToggle, moveToggle, panToggle,  editTextToggle, resizeToggle);
         umlBoxLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new UMLBox()));
-        arrowLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new PolyArrow()));
+        //arrowLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new PolyArrow(mouseEvent.getX(), mouseEvent.getY())));
         editMode = EditMode.SELECT;
         selectToggle.setSelected(true);
         setEditMode(editMode);
@@ -136,6 +142,40 @@ public class UMLEditorController extends Controller{
             System.out.println("Image saved successfully!");
         } catch (Exception e) {
             System.err.println("Error saving image: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void drawArrow(MouseEvent mouseEvent) {
+        for (Node node: stackPane.getChildren()) {
+            if (node != scrollPane) node.setDisable(true);
+        }
+        modeChanger(false, false, false, false, false);
+        for (Node node : contentPane.getChildren()) {
+            //Recursion to get "from" and "to", then draw a PolyArrow.
+            if (node instanceof UMLBox ub) {
+                ub.setOnMouseClicked(e -> {
+                    UMLBox from = (UMLBox) e.getSource();
+                    for (Node node1 : contentPane.getChildren()) {
+                        if (node1 instanceof UMLBox ub1) {
+                            ub1.setOnMouseClicked(e1 -> {
+                                UMLBox to = (UMLBox) e1.getSource();
+                                try {
+                                    if (from == to) throw new Exception("Arrow cannot be drawn to and from the same box!");
+                                    contentPane.getChildren().add(new PolyArrow(from, to));
+                                } catch (Exception ex) {
+                                    showAlert(Alert.AlertType.ERROR, "Arrow Drawing - Error", "Arrow Drawing Operation Cancelled", ex.getMessage(), false);
+                                } finally {
+                                    for (Node node2 : stackPane.getChildren()) {
+                                        node2.setDisable(false);
+                                        setEditMode(editMode);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -169,6 +209,10 @@ public class UMLEditorController extends Controller{
             case DIGIT5:
                 selectedToggle = resizeToggle;
                 editMode = EditMode.RESIZE; break;
+            case ESCAPE:
+                propertiesLbl.setVisible(editMode ==  EditMode.SELECT);
+                propBox1.setVisible(false);
+                propBox2.setVisible(false);
             default: return;
         }
         for (ToggleButton btn : modeToggles) {
@@ -181,12 +225,15 @@ public class UMLEditorController extends Controller{
         //Ok for now this thing will be here, but you should most definitely move it elsewhere once ready
         Bounds paneBounds = scrollPane.localToScene(scrollPane.getBoundsInLocal());
         if (!paneBounds.contains(mouseEvent.getSceneX(), mouseEvent.getSceneY())) return;
-
+        Point2D point = contentPane.sceneToLocal(mouseEvent.getSceneX(), mouseEvent.getSceneY());
         if (node instanceof UMLBox ub){
             contentPane.getChildren().add(ub);
-            Point2D point = contentPane.sceneToLocal(mouseEvent.getSceneX(), mouseEvent.getSceneY());
             ub.setTranslateX(point.getX() - ub.getWidth());
             ub.setTranslateY(point.getY() - ub.getHeight());
+        }else if (node instanceof PolyArrow arrow){
+            contentPane.getChildren().add(arrow);
+            Point2D end = new Point2D(point.getX() + 50, point.getY());
+            arrow.updateArrow();
         }
         setEditMode(editMode);
     }
@@ -212,25 +259,26 @@ public class UMLEditorController extends Controller{
         switch(editMode){
             case SELECT:
                 scrollPane.setCursor(Cursor.DEFAULT);
-                modeChanger(false, false, false, true); break;
+                modeChanger(false, false, false, true, false); break;
             case MOVE:
                 scrollPane.setCursor(Cursor.MOVE);
-                modeChanger(false, true, false, false); break;
+                modeChanger(false, true, false, false, false); break;
             case PAN:
                 scrollPane.setCursor(Cursor.OPEN_HAND);
-                modeChanger(true, false, false, false); break;
+                modeChanger(true, false, false, false, false); break;
             case EDIT_TEXT:
                 scrollPane.setCursor(Cursor.TEXT);
-                modeChanger(true, false, true, false); break;
+                modeChanger(true, false, true, false, true); break;
             case RESIZE:
                 scrollPane.setCursor(Cursor.SE_RESIZE);
-                modeChanger(false, false, false, false); //TODO: WORK ON THIS
+                modeChanger(false, false, false, false, true);
             default: break;
         }
     }
-    private void modeChanger(boolean pannable, boolean draggable, boolean editable, boolean selectable){
+    private void modeChanger(boolean pannable, boolean draggable, boolean editable, boolean selectable, boolean resizable){
         scrollPane.setPannable(pannable);
         propertiesLbl.setVisible(selectable);
+        gridPane.setOnKeyPressed(this::checkKeyPress);
         propBox1.setVisible(false);
         propBox2.setVisible(false);
         List<Node> nodes = contentPane.getChildren();
@@ -240,6 +288,10 @@ public class UMLEditorController extends Controller{
                 else DraggableMaker.reset(umlBox);
                 umlBox.setEditable(editable);
                 umlBox.setSelectable(selectable);
+                umlBox.setResizable(resizable);
+            }
+            else if (node instanceof PolyArrow arrow){
+                arrow.setSelectable(selectable);
             }
         }
     }
@@ -270,8 +322,8 @@ public class UMLEditorController extends Controller{
             borderWidthField.setOnAction(e -> {
                 try {
                     double borderWidth = Double.parseDouble(borderWidthField.getText());
-                    System.out.println(borderWidth);
                     umlBox.setStyle(umlBox.getStyle() + "; -fx-border-width: " + borderWidth + "px");
+                    umlBox.updatePrefHeight(borderWidth);
                 } catch (NumberFormatException ex) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
                 }
@@ -286,13 +338,40 @@ public class UMLEditorController extends Controller{
                     for (Node n: umlBox.getChildren()){
                         InlineCssTextArea ta = (InlineCssTextArea) n;
                         ta.setStyle(ta.getStyle() + "; -fx-font-size: " + size + "px");
-                        int lines = ta.getText().split("\\n").length;
-                        ta.setPrefHeight(Math.max(1, lines) * UMLBox.getFontSize(textArea) * 2.5);// + 2 * umlBox.getBorderWidth());
+                        umlBox.updatePrefHeight();
                     }
                 } catch (NumberFormatException ex) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
                 }
             });
+        }else if (node instanceof PolyArrow arrow){
+            borderColorPicker.setValue(arrow.getStrokeColor());
+            borderWidthField.setText(arrow.getStrokeWidth() + "");
+            borderColorPicker.setOnAction(_ -> arrow.setStrokeColor(borderColorPicker.getValue()));
+            borderWidthField.setOnAction(_ -> {
+                try {
+                    arrow.setStrokeWidth(Double.parseDouble(borderWidthField.getText()));
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                }
+            });
+        }
+        delBtn.setOnMouseClicked(_ -> delete(node));
+        gridPane.setOnKeyPressed(keyEvent -> {
+            if (keyEvent.getCode() == KeyCode.DELETE ||  keyEvent.getCode() == KeyCode.BACK_SPACE) {
+                delete(node);
+            }
+        });
+        gridPane.addEventHandler(KeyEvent.KEY_PRESSED, this::checkKeyPress);
+    }
+
+    private void delete(Node node){
+        boolean confirmed = showAlert(Alert.AlertType.CONFIRMATION, "Node Deletion - Confirmation", "Confirm Delete", "Are you sure you want to delete this node?", true);
+        if (confirmed){
+            ((Pane) node.getParent()).getChildren().remove(node);
+            propBox1.setVisible(false);
+            propBox2.setVisible(false);
+            gridPane.setOnKeyPressed(this::checkKeyPress);
         }
     }
 }

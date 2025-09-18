@@ -9,6 +9,8 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.effect.Bloom?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -78,7 +80,7 @@
             <Insets top="5.0" />
          </GridPane.margin>
       </HBox>
-      <StackPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
+      <StackPane fx:id="stackPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
          <children>
             <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER" hvalue="0.5" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" pannable="true" prefWidth="1050.0" vbarPolicy="NEVER" vvalue="0.5" StackPane.alignment="CENTER_RIGHT">
                <StackPane.margin>
@@ -100,9 +102,9 @@
                               <Cursor fx:constant="OPEN_HAND" />
                            </cursor>
                         </Label>
-                        <Label fx:id="arrowLbl" layoutX="31.0" layoutY="10.0" style="-fx-font-size: 28px;" styleClass="label1" text="Arrow">
+                        <Label fx:id="arrowLbl" layoutX="31.0" layoutY="10.0" onMouseClicked="#drawArrow" style="-fx-font-size: 28px;" styleClass="label1" text="Arrow">
                            <cursor>
-                              <Cursor fx:constant="OPEN_HAND" />
+                              <Cursor fx:constant="HAND" />
                            </cursor>
                         </Label>
                         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
@@ -133,6 +135,15 @@
                         </Label>
                         <VBox fx:id="propBox1" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
                            <children>
+                              <Button fx:id="delBtn" mnemonicParsing="false">
+                                 <graphic>
+                                    <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@delete.png" />
+                                       </image>
+                                    </ImageView>
+                                 </graphic>
+                              </Button>
                               <Label styleClass="label1" text="Border/Stroke Color:">
                                  <font>
                                     <Font size="14.0" />
