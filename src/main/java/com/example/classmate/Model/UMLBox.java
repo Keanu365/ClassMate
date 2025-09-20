@@ -150,22 +150,31 @@ public class UMLBox extends VBox implements Selectable, Resizable {
         }
     }
 
-    public Point2D getTopMiddlePoint(){
-        Bounds bounds = this.getBoundsInLocal();
-        return this.getParent().sceneToLocal(
-                this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY())
-        );
+    public enum Midpoint {
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT,
+        CENTRE
     }
-    public Point2D getBottomMiddlePoint(){
+    public Point2D getPoint(Midpoint point){
         Bounds bounds = this.getBoundsInLocal();
-        return this.getParent().sceneToLocal(
-                this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMaxY())
-        );
-    }
-    public Point2D getMiddlePoint(){
-        return new Point2D(
-                this.getTopMiddlePoint().getX(),
-                (this.getTopMiddlePoint().getY() + this.getBottomMiddlePoint().getY()) / 2.0
-        );
+        return switch (point) {
+            case TOP -> this.getParent().sceneToLocal(
+                    this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY())
+            );
+            case BOTTOM -> this.getParent().sceneToLocal(
+                    this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMaxY())
+            );
+            case LEFT -> this.getParent().sceneToLocal(
+                    this.localToScene(bounds.getMinX(), bounds.getMinY() + bounds.getHeight() / 2)
+            );
+            case RIGHT -> this.getParent().sceneToLocal(
+                    this.localToScene(bounds.getMaxX(), bounds.getMinY() + bounds.getHeight() / 2)
+            );
+            case CENTRE -> this.getParent().sceneToLocal(
+                    this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() + bounds.getHeight() / 2)
+            );
+        };
     }
 }

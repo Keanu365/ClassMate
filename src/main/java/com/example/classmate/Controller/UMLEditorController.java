@@ -28,7 +28,6 @@ import javafx.scene.paint.Color;
 import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.*;
-import java.util.List;
 
 public class UMLEditorController extends Controller{
 
@@ -151,6 +150,15 @@ public class UMLEditorController extends Controller{
             if (node != scrollPane) node.setDisable(true);
         }
         modeChanger(false, false, false, false, false);
+        gridPane.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ESCAPE) {
+                for (Node node2 : stackPane.getChildren()) {
+                    node2.setDisable(false);
+                    setEditMode(editMode);
+                }
+                gridPane.setOnKeyPressed(this::checkKeyPress);
+            }
+        });
         for (Node node : contentPane.getChildren()) {
             //Recursion to get "from" and "to", then draw a PolyArrow.
             if (node instanceof UMLBox ub) {
@@ -162,7 +170,18 @@ public class UMLEditorController extends Controller{
                                 UMLBox to = (UMLBox) e1.getSource();
                                 try {
                                     if (from == to) throw new Exception("Arrow cannot be drawn to and from the same box!");
-                                    contentPane.getChildren().add(new PolyArrow(from, to));
+                                    PolyArrow arrow = new PolyArrow(from, to);
+                                    ArrayList<PolyArrow> others = new ArrayList<>();
+                                    for (Node node2 : contentPane.getChildren()) {
+                                        if (node2 instanceof PolyArrow other) {
+                                            if (arrow.equals(other)) throw new Exception("This arrow has already been drawn!");
+                                            others.add(other);
+                                        }
+                                    }
+                                    if (arrow.checkCyclic(others.toArray(new PolyArrow[0]))){
+                                        boolean draw = showAlert(Alert.AlertType.WARNING, "Arrow Drawing - Warning", "Cyclic Relationship Warning", "Warning: Drawing this arrow will result in a cyclic relationship! Do you wish to proceed?", true);
+                                        if (draw) contentPane.getChildren().add(arrow);
+                                    }else contentPane.getChildren().add(arrow);
                                 } catch (Exception ex) {
                                     showAlert(Alert.AlertType.ERROR, "Arrow Drawing - Error", "Arrow Drawing Operation Cancelled", ex.getMessage(), false);
                                 } finally {
@@ -170,6 +189,7 @@ public class UMLEditorController extends Controller{
                                         node2.setDisable(false);
                                         setEditMode(editMode);
                                     }
+                                    gridPane.setOnKeyPressed(this::checkKeyPress);
                                 }
                             });
                         }
