@@ -1,8 +1,7 @@
 package com.example.classmate.Controller;
 
 import com.example.classmate.Model.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
@@ -86,52 +85,100 @@ public class UMLEditorController extends Controller{
     private final ArrayList<ToggleButton> modeToggles = new ArrayList<>(5);
 
     EditMode editMode;
+    private static final double spacing = 250;
 
     @FXML
     public void initialize(){
-        scrollPane.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                //System.out.println("Scene Width changed from " + oldValue + " to " + newValue);
-                scrollPane.setPrefWidth(((Pane) scrollPane.getParent()).getWidth() - 150);
-            }
-        });
+        scrollPane.widthProperty().addListener((_, _, _) -> scrollPane.setPrefWidth(((Pane) scrollPane.getParent()).getWidth() - 150));
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
-        //dm.makeDraggable(arrowLbl, true);
         contentPane.setPrefSize(10000, 10000);
 
-        int counter = 1;
         if (UMLController.umlClasses != null) {
-            for (UMLClass uc : UMLController.umlClasses) {
+            ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLController.umlClasses));
+            double currentTranslateX = 4000 - spacing;
+            double currentTranslateY = 5000;
+            ObservableList<Node> children = contentPane.getChildren();
+            for (UMLClass uc : umlClasses) {
                 if (uc.getName().equals("null")) continue;
+                currentTranslateX += spacing;
                 UMLBox ub = new UMLBox(uc);
-                contentPane.getChildren().add(ub);
-                ub.setTranslateX(50 * counter);
-                ub.setTranslateY(50 * counter);
-                ub.setEditable(false);
-                counter++;
+                for (Node node : children){
+                    if (node instanceof UMLBox otherUb){
+                        if (ub.equals(otherUb)){
+                            ub = otherUb;
+                            break;
+                        }
+                    }
+                }
+                if (!children.contains(ub)) {
+                    children.add(ub);
+                    ub.setTranslateX(currentTranslateX);
+                    ub.setTranslateY(currentTranslateY);
+                }
+                Class<?> parentClass = uc.getSuperclass();
+                Class<?>[] implementedInterfaces = uc.getInterfaces();
+                //All code in for loop after this point deals with parent classes/interfaces
+                UMLClass parent_uc = new UMLClass(parentClass);
+                boolean parentPresent = false;
+                for (UMLClass umlClass : umlClasses) {
+                    try {
+                        if (parent_uc.equals(umlClass)) {parentPresent = true; break;}
+                    } catch (Exception e) {
+                        break;
+                    }
+                }
+                if (parentPresent) {
+                    UMLBox parent_ub = new UMLBox(parent_uc);
+                    addParentUMLBox(parent_ub, ub, currentTranslateX);
+                }
+                for (Class<?> implementedInterface : implementedInterfaces) {
+                    int count = 0;
+                    for (UMLClass umlClass : umlClasses) {
+                        if (implementedInterface.isAssignableFrom(umlClass.getUMLClass())) {
+                            UMLClass interfaceClass = new UMLClass(implementedInterface);
+                            addParentUMLBox(new UMLBox(interfaceClass), ub, currentTranslateX + spacing * count);
+                            count++;
+                        }
+                    }
+                }
             }
         }
-
         Collections.addAll(modeToggles, selectToggle, moveToggle, panToggle,  editTextToggle, resizeToggle);
         umlBoxLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new UMLBox()));
-        //arrowLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new PolyArrow(mouseEvent.getX(), mouseEvent.getY())));
         editMode = EditMode.SELECT;
         selectToggle.setSelected(true);
         setEditMode(editMode);
     }
 
+    private void addParentUMLBox(UMLBox parent, UMLBox child, double translateX){
+        ObservableList<Node> children = contentPane.getChildren();
+        for (Node node : children){
+            if (node instanceof UMLBox otherUb){
+                if (parent.equals(otherUb)){
+                    parent = otherUb;
+                    break;
+                }
+            }
+        }
+        if (!children.contains(parent)) {
+            children.add(parent);
+        }
+        parent.setTranslateX(translateX - spacing);
+        parent.setTranslateY(child.getTranslateY() - parent.calcHeight() - spacing);
+        children.add(new PolyArrow(child, parent));
+    }
+
     @FXML
-    public void save(MouseEvent mouseEvent) {
+    public void save() {
         Bounds bounds = getContentBounds(contentPane);
 
         SnapshotParameters params = new SnapshotParameters();
         params.setViewport(new Rectangle2D(
                 bounds.getMinX()-10.0,
                 bounds.getMinY()-10.0,
-                bounds.getWidth()+10.0,
-                bounds.getHeight()+10.0
+                bounds.getWidth()+20.0,
+                bounds.getHeight()+20.0
         ));
         WritableImage image = contentPane.snapshot(params, null);
         try {
@@ -145,7 +192,7 @@ public class UMLEditorController extends Controller{
     }
 
     @FXML
-    private void drawArrow(MouseEvent mouseEvent) {
+    private void drawArrow() {
         for (Node node: stackPane.getChildren()) {
             if (node != scrollPane) node.setDisable(true);
         }
@@ -252,7 +299,6 @@ public class UMLEditorController extends Controller{
             ub.setTranslateY(point.getY() - ub.getHeight());
         }else if (node instanceof PolyArrow arrow){
             contentPane.getChildren().add(arrow);
-            Point2D end = new Point2D(point.getX() + 50, point.getY());
             arrow.updateArrow();
         }
         setEditMode(editMode);
@@ -331,7 +377,7 @@ public class UMLEditorController extends Controller{
             int start = textArea.getStyle().lastIndexOf("-fx-font-size:") + 14;
             int end = textArea.getStyle().indexOf("p", start); //We will always be using px
             fontSizeField.setText(Double.parseDouble(textArea.getStyle().substring(start, end).replace(" ","")) + "");
-            borderColorPicker.setOnAction(e -> {
+            borderColorPicker.setOnAction(_ -> {
                 Color newColor = borderColorPicker.getValue();
                 String css = String.format("rgb(%d,%d,%d);",
                         (int)(newColor.getRed() * 255),
@@ -339,26 +385,26 @@ public class UMLEditorController extends Controller{
                         (int)(newColor.getBlue() * 255));
                 umlBox.setStyle(umlBox.getStyle() + "; -fx-border-color: " + css);
             });
-            borderWidthField.setOnAction(e -> {
+            borderWidthField.setOnAction(_ -> {
                 try {
                     double borderWidth = Double.parseDouble(borderWidthField.getText());
                     umlBox.setStyle(umlBox.getStyle() + "; -fx-border-width: " + borderWidth + "px");
-                    umlBox.updatePrefHeight(borderWidth);
+//                    umlBox.updatePrefHeight(borderWidth);
                 } catch (NumberFormatException ex) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
                 }
             });
-            fontColorPicker.setOnAction(e -> {
+            fontColorPicker.setOnAction(_ -> {
                 Color newColor = fontColorPicker.getValue();
                 umlBox.setFontColor(newColor);
             });
-            fontSizeField.setOnAction(e -> {
+            fontSizeField.setOnAction(_ -> {
                 try {
                     double size = Double.parseDouble(fontSizeField.getText());
                     for (Node n: umlBox.getChildren()){
                         InlineCssTextArea ta = (InlineCssTextArea) n;
                         ta.setStyle(ta.getStyle() + "; -fx-font-size: " + size + "px");
-                        umlBox.updatePrefHeight();
+//                        umlBox.updatePrefHeight();
                     }
                 } catch (NumberFormatException ex) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);

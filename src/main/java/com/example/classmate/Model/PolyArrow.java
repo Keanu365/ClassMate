@@ -27,6 +27,8 @@ public class PolyArrow extends Group implements Selectable{
                 -16.0,  8.0);
         this.arrow.setStrokeWidth(3.0);
         this.arrow.setStroke(strokeColor);
+        if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().addAll(1.0, 8.0);
+        else if (!to.isInterface() && from.isInterface()) throw new IllegalArgumentException("Interfaces cannot extend non-interfaces!");
         this.arrowHead.setStyle("-fx-background-color: black;");
         this.updateArrow();
         ReadOnlyDoubleProperty[] properties = new ReadOnlyDoubleProperty[]{
@@ -87,6 +89,8 @@ public class PolyArrow extends Group implements Selectable{
         }
         arrowHead.setScaleX(this.arrow.getStrokeWidth() / 3.0);
         arrowHead.setScaleY(this.arrow.getStrokeWidth() / 3.0);
+        if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().addAll(1.0, 8.0);
+        else this.arrow.getStrokeDashArray().addAll();
         //TODO: you need to implement resize and save and tutorial and letting the user underline
     }
 

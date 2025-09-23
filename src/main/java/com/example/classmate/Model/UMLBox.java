@@ -14,12 +14,14 @@ import java.util.List;
 
 public class UMLBox extends VBox implements Selectable, Resizable {
     public Color fontColor = Color.BLACK;
+    private boolean isInterface = false;
 
     public UMLBox() {
-        this("Name", "Fields", "Methods");
+        this("Name\n", "Fields\n", "Methods\n");
     }
     public UMLBox(UMLClass uc){
         this(uc.getName(), uc.getFields(), uc.getMethods());
+        isInterface = uc.getUMLClass().isInterface();
     }
     public UMLBox(String name, String fields, String methods) {
         super();
@@ -39,7 +41,6 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                 textArea.replaceText(text);
                 textArea.getStyleClass().add("uml_label");
                 textArea.setStyle("-fx-font-size: 12px;");
-                String[] lines = text.split("\\n");
                 List<int[]> list = new ArrayList<>();
                 while (textArea.getText().contains("(static)")) {
                     int start = textArea.getText().indexOf("(static)");
@@ -50,17 +51,22 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                 for (int[] i : list) {
                     textArea.setStyle(i[0], i[1], "-fx-underline: true;");
                 }
-                this.updatePrefHeight();
+//                this.updatePrefHeight();
                 textArea.borderProperty().bind(this.borderProperty());
                 textArea.prefWidthProperty().bindBidirectional(this.prefWidthProperty());
                 textArea.setWrapText(true);
-                this.getChildren().add(textArea);
-                textArea.textProperty().addListener((obs, oldText, newText) -> {
-                    this.updatePrefHeight();
+//                textArea.prefHeightProperty().bind(textArea.totalHeightEstimateProperty());
+                textArea.prefHeightProperty().bind(textArea.totalHeightEstimateProperty());
+                textArea.textProperty().addListener((_, _, _) -> {
+                    if (!textArea.getText().endsWith("\n")) textArea.replaceText(textArea.getText() + "\n");
                 });
+                textArea.showParagraphAtTop(0);
+                this.getChildren().add(textArea);
             }
             new DraggableMaker().makeDraggable(this);
     }
+
+    public boolean isInterface(){return this.isInterface;}
 
     public void setEditable(boolean editable){
         for (Node n : this.getChildren()){
@@ -97,11 +103,11 @@ public class UMLBox extends VBox implements Selectable, Resizable {
         //TODO: WORK ON THIS
         for (Node node : this.getChildren()){
             //InlineCssTextArea textArea = (InlineCssTextArea) node;
-            node.setOnMouseMoved(event -> handleMouseMoved(node, event));
+            node.setOnMouseMoved(this::handleMouseMoved);
         }
     }
 
-    private void handleMouseMoved(Node node, MouseEvent event) {
+    private void handleMouseMoved(MouseEvent event) {
         double x = event.getX();
         double y = event.getY();
         double w = this.getWidth();
@@ -132,24 +138,6 @@ public class UMLBox extends VBox implements Selectable, Resizable {
         }
     }
 
-    public static double getFontSize(InlineCssTextArea textArea){
-        int start = textArea.getStyle().lastIndexOf("-fx-font-size:") + 14;
-        int end = textArea.getStyle().indexOf("p", start); //We will always be using px
-        return Double.parseDouble(textArea.getStyle().substring(start, end).replace(" ",""));
-    }
-    public double getBorderWidth(){
-        return this.getBorder().getStrokes().getFirst().getWidths().getTop();
-    }
-
-    public void updatePrefHeight(){this.updatePrefHeight(this.getBorderWidth());}
-    public void updatePrefHeight(double borderWidth){ //Required to accommodate for UMLEditorController:274
-        for (Node n : this.getChildren()){
-            InlineCssTextArea textArea = (InlineCssTextArea) n;
-            int lines = textArea.getText().split("\\n").length;
-            textArea.setPrefHeight(Math.max(1, lines) * getFontSize(textArea) * 2.5 + 2 * borderWidth);
-        }
-    }
-
     public enum Midpoint {
         TOP,
         BOTTOM,
@@ -176,5 +164,31 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                     this.localToScene(bounds.getMinX() + bounds.getWidth() / 2, bounds.getMinY() + bounds.getHeight() / 2)
             );
         };
+    }
+
+    public double calcHeight(){
+        double height = 0;
+        for (Node node : this.getChildren()){
+            InlineCssTextArea textArea = (InlineCssTextArea) node;
+            height += textArea.getPrefHeight();
+        }
+        return height;
+    }
+
+    @Override
+    public String toString(){
+        String retStr = "";
+        for (Node node : this.getChildren()){
+            InlineCssTextArea textArea = (InlineCssTextArea) node;
+            retStr += textArea.getText();
+            retStr += "\n\n";
+        }
+        return retStr;
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if (obj instanceof UMLBox other) return this.toString().equals(other.toString());
+        else return false;
     }
 }

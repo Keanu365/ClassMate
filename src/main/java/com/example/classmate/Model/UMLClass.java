@@ -12,8 +12,7 @@ public class UMLClass {
     private boolean simpleNames;
 
     public UMLClass(Class<?> c) {
-        this.c = c;
-        simpleNames = false;
+        this(c, false);
     }
 
     public UMLClass(Class<?> c, boolean sn) {
@@ -63,7 +62,6 @@ public class UMLClass {
     public Class<?> getUMLClass(){
         return this.c;
     }
-
     public void setUMLClass(Class<?> c){
         this.c = c;
     }
@@ -71,9 +69,14 @@ public class UMLClass {
     public boolean isSimpleNames(){return this.simpleNames;}
     public void setSimpleNames(boolean sn){this.simpleNames = sn;}
 
-    public boolean hasSuperclass(){
-        return this.c.getSuperclass() != Object.class;
+    public Class<?> getSuperclass(){
+        if (this.c.getSuperclass() != Object.class) {
+            return this.c.getSuperclass();
+        }
+        return null;
     }
+
+    public Class<?>[] getInterfaces(){return this.c.getInterfaces();}
 
     private static String getLine(AccessibleObject obj, boolean simpleNames) {
         String[] tokens = obj.toString().split(" ");
@@ -167,8 +170,6 @@ public class UMLClass {
             }else if (file.isFile() && file.getName().endsWith(".class")){
                 String absPath = file.getAbsolutePath();
                 String relPath = absPath.substring(rootFolder.getAbsolutePath().length()+1);
-//                System.out.println(absPath);
-//                System.out.println(relPath);
                 classes.add(load(relPath, classLoader));
             }
         }
@@ -180,5 +181,8 @@ public class UMLClass {
         return this.getName() + "\n\n" + this.getFields() + "\n" + this.getConstructors() + "\n" + this.getMethods();
     }
 
-//    private ArrayList<String> getFQCN()
+    @Override
+    public boolean equals(Object obj){
+        return obj instanceof UMLClass uc && this.toString().equals(uc.toString());
+    }
 }
