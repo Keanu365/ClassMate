@@ -1,10 +1,13 @@
 package com.example.classmate.Model;
 
 import com.example.classmate.Controller.UMLEditorController;
+import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.fxmisc.richtext.InlineCssTextArea;
@@ -14,6 +17,7 @@ import java.util.List;
 
 public class UMLBox extends VBox implements Selectable, Resizable {
     public Color fontColor = Color.BLACK;
+    public PolyArrow arrow = null;
     private boolean isInterface = false;
 
     public UMLBox() {
@@ -33,37 +37,69 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                 new BorderWidths(1)            // thickness (2px)
         );
         this.setBorder(new Border(borderStroke));
-        this.setStyle("-fx-pref-width: 200px; -fx-border-color: black");
+        this.setPrefWidth(200);
         //Text stuff :3
         String[] texts = new String[]{name, fields, methods};
-            for (String text : texts) {
-                InlineCssTextArea textArea = new InlineCssTextArea();
-                textArea.replaceText(text);
-                textArea.getStyleClass().add("uml_label");
-                textArea.setStyle("-fx-font-size: 12px;");
-                List<int[]> list = new ArrayList<>();
-                while (textArea.getText().contains("(static)")) {
-                    int start = textArea.getText().indexOf("(static)");
-                    textArea.replaceText(textArea.getText().replaceFirst("\\(static\\)", ""));
-                    int end = textArea.getText().indexOf("\n", start);
-                    list.add(new int[]{start,end});
+        for (String text : texts) {
+            InlineCssTextArea textArea = new InlineCssTextArea();
+            textArea.replaceText(text);
+            textArea.getStyleClass().add("uml_label");
+            textArea.setStyle("-fx-font-size: 12px;");
+            textArea.borderProperty().bind(this.borderProperty());
+            textArea.prefWidthProperty().bind(this.prefWidthProperty());
+            textArea.setWrapText(true);
+            textArea.prefHeightProperty().bind(textArea.totalHeightEstimateProperty());
+            textArea.textProperty().addListener((_, _, _) -> {
+                if (!textArea.getText().endsWith("\n")) textArea.replaceText(textArea.getText() + "\n");
+                if (arrow != null) arrow.updateArrow();
+            });
+            textArea.showParagraphAtTop(0);
+            if (this.getChildren().isEmpty()) {//i.e. title text area
+                textArea.textProperty().addListener((_, _, _) ->
+                        this.isInterface = textArea.getText().startsWith("<<interface>>"));
+            } else textArea.setOnKeyPressed(keyEvent -> {
+                if (keyEvent.getCode() == KeyCode.ENTER) {
+                    this.underlineStatics();
                 }
-                for (int[] i : list) {
-                    textArea.setStyle(i[0], i[1], "-fx-underline: true;");
-                }
-//                this.updatePrefHeight();
-                textArea.borderProperty().bind(this.borderProperty());
-                textArea.prefWidthProperty().bindBidirectional(this.prefWidthProperty());
-                textArea.setWrapText(true);
-//                textArea.prefHeightProperty().bind(textArea.totalHeightEstimateProperty());
-                textArea.prefHeightProperty().bind(textArea.totalHeightEstimateProperty());
-                textArea.textProperty().addListener((_, _, _) -> {
-                    if (!textArea.getText().endsWith("\n")) textArea.replaceText(textArea.getText() + "\n");
-                });
-                textArea.showParagraphAtTop(0);
-                this.getChildren().add(textArea);
+            });
+            this.getChildren().add(textArea);
+            Platform.runLater(this::underlineStatics);
+        }
+        new DraggableMaker().makeDraggable(this);
+        DoubleProperty[] properties = new DoubleProperty[3];
+        for (int i = 0; i < 3; i++){
+            InlineCssTextArea textArea = (InlineCssTextArea) this.getChildren().get(i);
+            properties[i] = textArea.prefHeightProperty();
+        }
+        this.prefHeightProperty().bind(properties[0].add(properties[1]).add(properties[2]));
+    }
+
+    List<String> fieldsToUnderline = new ArrayList<>();
+    List<String> methodsToUnderline = new ArrayList<>();
+    private void underlineStatics(){
+        for (Node node : this.getChildren()){
+            if (node.equals(this.getChildren().getFirst())) continue;
+            List<String> toUnderline;
+            if (node.equals(this.getChildren().get(1))) toUnderline = fieldsToUnderline;
+            else toUnderline = methodsToUnderline;
+            InlineCssTextArea textArea = (InlineCssTextArea) node;
+            textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false;");
+            while (textArea.getText().contains("{s}")) {
+                int start = textArea.getText().indexOf("{s}");
+                textArea.replaceText(textArea.getText().replaceFirst("\\{s}", ""));
+                int end = textArea.getText().indexOf("{s}", start);
+                textArea.replaceText(textArea.getText().replaceFirst("\\{s}", ""));
+                toUnderline.add(textArea.getText().substring(start, end));
             }
-            new DraggableMaker().makeDraggable(this);
+            for (String string : toUnderline) {
+                int start = textArea.getText().indexOf(string);
+                if (start == -1) {
+                    toUnderline.remove(string);
+                    continue;
+                }
+                textArea.setStyle(start, start + string.length(), "-fx-underline: true;");
+            }
+        }
     }
 
     public boolean isInterface(){return this.isInterface;}
@@ -84,10 +120,12 @@ public class UMLBox extends VBox implements Selectable, Resizable {
     }
 
     public void setResizable(boolean resizable){
+        //Warning: Must be implemented before draggable
         if (!resizable) {
-            for (Node node : this.getChildren()){
-                node.setOnMouseMoved(_ -> {});
-            }
+            this.setOnMouseEntered(_ -> {});
+            this.setOnMousePressed(_ -> {});
+            this.setOnMouseDragged(_ -> {});
+            this.setOnMouseReleased(_ -> {});
         }
         else {
             resize();
@@ -99,30 +137,40 @@ public class UMLBox extends VBox implements Selectable, Resizable {
         controller.showProperties(this, true, true);
     }
 
+    private double mouseX = 0;
+    private boolean resizing = false;
+    private double anchorX = 0;
     public void resize(){
-        //TODO: WORK ON THIS
-        for (Node node : this.getChildren()){
-            //InlineCssTextArea textArea = (InlineCssTextArea) node;
-            node.setOnMouseMoved(this::handleMouseMoved);
-        }
-    }
+        //Since height is auto-calibrated, this method will only support width resizing.
+        //Of course, if more time was given, height resizing would have been implemented.
+        this.setOnMouseEntered(event -> {
+            double x = event.getX();
+            double w = this.getWidth();
 
-    private void handleMouseMoved(MouseEvent event) {
-        double x = event.getX();
-        double y = event.getY();
-        double w = this.getWidth();
-        double h = this.getHeight();
+            double margin = Resizable.BORDER_THRESHOLD; // px threshold for borders
 
-        double margin = 5; // px threshold for borders
-
-        if (x < margin || x > w - margin) {
-            System.out.println("ew border");
-        }else if (y < margin || y > h - margin){
-            System.out.println("ns border");
-        }
-        else {
-            System.out.println("no border");
-        }
+            if (x < margin) {
+                this.setCursor(Cursor.W_RESIZE);
+            } else if (x > w - margin) {
+                this.setCursor(Cursor.E_RESIZE);
+            } else this.setCursor(Cursor.DEFAULT);
+        });
+        this.setOnMousePressed(_ -> {
+            resizing = this.getCursor() == Cursor.E_RESIZE || this.getCursor() == Cursor.W_RESIZE;
+            anchorX = this.getPoint(this.getCursor() == Cursor.W_RESIZE ? Midpoint.RIGHT : Midpoint.LEFT).getX();
+        });
+        this.setOnMouseDragged(mouseEvent -> {
+            if (!resizing) return;
+            Pane pane = (Pane) this.getParent();
+            mouseX = pane.sceneToLocal(mouseEvent.getSceneX(), mouseEvent.getSceneY()).getX();
+            if (this.getCursor() == Cursor.W_RESIZE) this.setTranslateX(mouseX);
+            double newWidth = Math.abs(mouseX - anchorX);
+            this.setPrefWidth(newWidth);
+        });
+        this.setOnMouseReleased(_ -> {
+            resizing = false;
+            this.setCursor(Cursor.DEFAULT);
+        });
     }
 
     public Color getFontColor(){return this.fontColor;}

@@ -2,6 +2,7 @@ package com.example.classmate.Model;
 
 import com.example.classmate.Model.UMLBox.Midpoint;
 import com.example.classmate.Controller.UMLEditorController;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -21,6 +22,8 @@ public class PolyArrow extends Group implements Selectable{
     public PolyArrow(UMLBox from, UMLBox to){
         this.from = from;
         this.to = to;
+        from.arrow = this;
+        to.arrow = this;
         this.getChildren().addAll(arrow, arrowHead);
         arrowHead.getPoints().addAll(0.0, 0.0,
                 -16.0, -8.0,
@@ -69,29 +72,31 @@ public class PolyArrow extends Group implements Selectable{
 
     public void updateArrow() {
         //Remember Y is inverted, i.e. the lower down it is the greater the value
-        if (from.getPoint(Midpoint.TOP).getY() > to.getPoint(Midpoint.BOTTOM).getY() + maxOffset * 2.0) {
-            this.elbowShape();
-        }else if (from.getPoint(Midpoint.BOTTOM).getY() + maxOffset * 2.0 < to.getPoint(Midpoint.TOP).getY()) {
-            this.elbowShape();
-        }else {
-            double distance = Math.abs(from.getPoint(Midpoint.CENTRE).getX() - to.getPoint(Midpoint.CENTRE).getX());
-            distance -= from.getWidth() / 2.0;
-            distance -= to.getWidth() / 2.0;
-            if (distance < maxOffset * 2.0) {
-                Point2D toMidpoint = to.getPoint(Midpoint.CENTRE);
-                if (from.getPoint(Midpoint.TOP).getY() > toMidpoint.getY() + maxOffset || from.getPoint(Midpoint.BOTTOM).getY() + maxOffset < toMidpoint.getY()) {
-                    distance += (from.getWidth() + to.getWidth()) / 4.0; //2*2
-                    distance -= maxOffset;
-                    if (distance < 0) this.cShape();
-                    else this.LShape();
-                } else this.uShape();
-            } else this.zShape();
-        }
-        arrowHead.setScaleX(this.arrow.getStrokeWidth() / 3.0);
-        arrowHead.setScaleY(this.arrow.getStrokeWidth() / 3.0);
-        if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().addAll(1.0, 8.0);
-        else this.arrow.getStrokeDashArray().addAll();
-        //TODO: you need to implement resize and save and tutorial and letting the user underline
+        Platform.runLater(() -> {
+            if (from.getPoint(Midpoint.TOP).getY() > to.getPoint(Midpoint.BOTTOM).getY() + maxOffset * 2.0) {
+                this.elbowShape();
+            }else if (from.getPoint(Midpoint.BOTTOM).getY() + maxOffset * 2.0 < to.getPoint(Midpoint.TOP).getY()) {
+                this.elbowShape();
+            }else {
+                double distance = Math.abs(from.getPoint(Midpoint.CENTRE).getX() - to.getPoint(Midpoint.CENTRE).getX());
+                distance -= from.getWidth() / 2.0;
+                distance -= to.getWidth() / 2.0;
+                if (distance < maxOffset * 2.0) {
+                    Point2D toMidpoint = to.getPoint(Midpoint.CENTRE);
+                    if (from.getPoint(Midpoint.TOP).getY() > toMidpoint.getY() + maxOffset || from.getPoint(Midpoint.BOTTOM).getY() + maxOffset < toMidpoint.getY()) {
+                        distance += (from.getWidth() + to.getWidth()) / 4.0; //2*2
+                        distance -= maxOffset;
+                        if (distance < 0) this.cShape();
+                        else this.LShape();
+                    } else this.uShape();
+                } else this.zShape();
+            }
+            arrowHead.setScaleX(this.arrow.getStrokeWidth() / 3.0);
+            arrowHead.setScaleY(this.arrow.getStrokeWidth() / 3.0);
+            if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().setAll(1.0, 8.0);
+            else this.arrow.getStrokeDashArray().setAll();
+        });
+        //TODO: you need to implement save and tutorial and letting the user underline
     }
 
     private void elbowShape(){
@@ -175,6 +180,12 @@ public class PolyArrow extends Group implements Selectable{
         arrowHead.setRotate(0);
         arrowHead.setTranslateX(end.getX() + 2);
         arrowHead.setTranslateY(end.getY());
+    }
+
+    public void detach(){
+        //Detach arrow from UMLBoxes.
+        this.from.arrow = null;
+        this.to.arrow = null;
     }
 
     @Override

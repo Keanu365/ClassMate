@@ -83,8 +83,7 @@ public class UMLController extends Controller{
         //TODO #2: Fix UMLClass.loadFolder() code
         //TODO #3: Scene transition animation
         try {
-            showScene(new Stage(), "ClassMate - UML Diagram Generator - What to upload?", "/com/example/classmate/View/uml-tut-view.fxml", //Replace path with new FXML file
-                    instructionsBtn.getScene().getWidth(), instructionsBtn.getScene().getHeight());
+            showScene(new Stage(), "ClassMate - UML Diagram Generator - What to upload?", "/com/example/classmate/View/uml-tut-view.fxml");
         }catch (Exception e){
             System.out.println("File not found.");
         }

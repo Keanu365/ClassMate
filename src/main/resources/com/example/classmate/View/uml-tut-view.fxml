@@ -89,7 +89,7 @@
             <Insets left="20.0" right="20.0" top="10.0" />
          </GridPane.margin>
       </Label>
-      <ImageView fx:id="gifView" fitHeight="180.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+      <ImageView fx:id="gifView" fitHeight="360.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <image>
             <Image url="@icon.png" />
          </image>

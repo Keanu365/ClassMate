@@ -334,10 +334,10 @@ public class UMLEditorController extends Controller{
                 modeChanger(true, false, false, false, false); break;
             case EDIT_TEXT:
                 scrollPane.setCursor(Cursor.TEXT);
-                modeChanger(true, false, true, false, true); break;
+                modeChanger(true, false, true, false, false); break;
             case RESIZE:
-                scrollPane.setCursor(Cursor.SE_RESIZE);
-                modeChanger(false, false, false, false, true);
+                scrollPane.setCursor(Cursor.DEFAULT);
+                modeChanger(false, false, false, true, true);
             default: break;
         }
     }
@@ -349,12 +349,12 @@ public class UMLEditorController extends Controller{
         propBox2.setVisible(false);
         List<Node> nodes = contentPane.getChildren();
         for (Node node : nodes) {
+            node.setCursor(scrollPane.getCursor());
             if (node instanceof UMLBox umlBox){
+                umlBox.setResizable(resizable); //Must do this before draggable
                 if (draggable) new DraggableMaker().makeDraggable(umlBox);
-                else DraggableMaker.reset(umlBox);
                 umlBox.setEditable(editable);
                 umlBox.setSelectable(selectable);
-                umlBox.setResizable(resizable);
             }
             else if (node instanceof PolyArrow arrow){
                 arrow.setSelectable(selectable);
@@ -364,6 +364,7 @@ public class UMLEditorController extends Controller{
 
     public void showProperties(Node node, boolean showBox1, boolean showBox2){
         //showBox1 will practically always be true anyway.
+        String regex = "^[1-9]\\d*(\\.\\d+)?$";
         if (!(showBox1 || showBox2)) return;
         propBox1.setVisible(showBox1);
         propBox2.setVisible(showBox2);
@@ -387,11 +388,14 @@ public class UMLEditorController extends Controller{
             });
             borderWidthField.setOnAction(_ -> {
                 try {
+                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
                     double borderWidth = Double.parseDouble(borderWidthField.getText());
                     umlBox.setStyle(umlBox.getStyle() + "; -fx-border-width: " + borderWidth + "px");
 //                    umlBox.updatePrefHeight(borderWidth);
-                } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                } catch (IllegalArgumentException e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "Unexpected Error", "An unexpected error occurred. Please try again later.", false);
                 }
             });
             fontColorPicker.setOnAction(_ -> {
@@ -400,14 +404,17 @@ public class UMLEditorController extends Controller{
             });
             fontSizeField.setOnAction(_ -> {
                 try {
+                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
                     double size = Double.parseDouble(fontSizeField.getText());
                     for (Node n: umlBox.getChildren()){
                         InlineCssTextArea ta = (InlineCssTextArea) n;
                         ta.setStyle(ta.getStyle() + "; -fx-font-size: " + size + "px");
 //                        umlBox.updatePrefHeight();
                     }
-                } catch (NumberFormatException ex) {
-                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                } catch (IllegalArgumentException e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "Unexpected Error", "An unexpected error occurred. Please try again later.", false);
                 }
             });
         }else if (node instanceof PolyArrow arrow){
@@ -416,9 +423,12 @@ public class UMLEditorController extends Controller{
             borderColorPicker.setOnAction(_ -> arrow.setStrokeColor(borderColorPicker.getValue()));
             borderWidthField.setOnAction(_ -> {
                 try {
+                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
                     arrow.setStrokeWidth(Double.parseDouble(borderWidthField.getText()));
-                } catch (NumberFormatException e) {
-                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please enter a valid integer/decimal only!", false);
+                } catch (IllegalArgumentException e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
+                } catch (Exception e) {
+                    showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "Unexpected Error", "An unexpected error occurred. Please try again later.", false);
                 }
             });
         }
@@ -438,6 +448,7 @@ public class UMLEditorController extends Controller{
             propBox1.setVisible(false);
             propBox2.setVisible(false);
             gridPane.setOnKeyPressed(this::checkKeyPress);
+            if (node instanceof PolyArrow arrow) arrow.detach();
         }
     }
 }

@@ -11,7 +11,7 @@ public class DraggableMaker {
         if (returnToOriginalPos){
             double originalX = node.getTranslateX();
             double originalY = node.getTranslateY();
-            node.setOnMouseReleased(mouseEvent -> {
+            node.setOnMouseReleased(_ -> {
                 node.setTranslateX(originalX);
                 node.setTranslateY(originalY);
             });
@@ -26,11 +26,5 @@ public class DraggableMaker {
             node.setTranslateX(mouseEvent.getSceneX() - mouseAnchorX);
             node.setTranslateY(mouseEvent.getSceneY() - mouseAnchorY);
         });
-    }
-
-    public static void reset(Node node){
-        node.setOnMouseReleased(null);
-        node.setOnMousePressed(null);
-        node.setOnMouseDragged(null);
     }
 }

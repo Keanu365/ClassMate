@@ -1,7 +1,5 @@
 package com.example.classmate.Controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -25,18 +23,15 @@ public class AIController extends Controller{
 
     @FXML
     void initialize(){
-        chatAreaPane.widthProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                //System.out.println("Scene Width changed from " + oldValue + " to " + newValue);
-                chatArea.setPrefWidth(chatAreaPane.getWidth()-15);
-            }
+        chatAreaPane.widthProperty().addListener((_, _, _) -> {
+            //System.out.println("Scene Width changed from " + oldValue + " to " + newValue);
+            chatArea.setPrefWidth(chatAreaPane.getWidth()-15);
         });
+        submitBtn.disableProperty().bind(userTextField.textProperty().isEmpty());
     }
 
     @FXML
-    void submit(InputEvent event) throws InterruptedException {
-        submitBtn.setDisable(userTextField.getText().isEmpty());
+    void submit(InputEvent event) {
         if (event instanceof KeyEvent keyEvent) {
             if (keyEvent.getCode() != KeyCode.ENTER) return;
         }
@@ -51,12 +46,8 @@ public class AIController extends Controller{
                 return generateAI(input);
             }
         };
-        task.setOnSucceeded(e -> {
-            response.setText(task.getValue());
-        });
-        task.setOnFailed(e -> {
-            response.setText("Something went wrong. Please try again later.");
-        });
+        task.setOnSucceeded(_ -> response.setText(task.getValue()));
+        task.setOnFailed(_ -> response.setText("Something went wrong. Please try again later."));
 
         new Thread(task).start();
     }
