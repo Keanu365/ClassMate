@@ -96,7 +96,6 @@ public class PolyArrow extends Group implements Selectable{
             if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().setAll(1.0, 8.0);
             else this.arrow.getStrokeDashArray().setAll();
         });
-        //TODO: you need to implement save and tutorial and letting the user underline
     }
 
     private void elbowShape(){

@@ -52,7 +52,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button fx:id="mmGenBtn" alignment="CENTER" layoutX="40.0" layoutY="115.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseEntered="#btnHover" onMouseExited="#btnUnhover" prefHeight="50.0" style="-fx-background-radius: 15;" styleClass="main_btn" text="Mindmap Generator" textFill="#1e2a38">
+            <Button fx:id="mmGenBtn" alignment="CENTER" layoutX="40.0" layoutY="115.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#showMMScene" onMouseEntered="#btnHover" onMouseExited="#btnUnhover" prefHeight="50.0" style="-fx-background-radius: 15;" styleClass="main_btn" text="Mindmap Generator" textFill="#1e2a38">
                <font>
                   <Font name="Ink Free" size="24.0" />
                </font>

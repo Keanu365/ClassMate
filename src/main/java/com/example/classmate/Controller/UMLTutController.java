@@ -41,7 +41,7 @@ public class UMLTutController extends Controller{
     @FXML
     void initialize(){
         for (int i = 0; i < images.length; i++) {
-            images[i] = new Image(getClass().getResource("/com/example/classmate/View/TutGIFS/GIF" + i + ".gif").toExternalForm());
+            images[i] = new Image(getClass().getResource(System.getProperty("user.dir") + "/com/example/classmate/View/TutGIFS/GIF" + i + ".gif").toExternalForm());
         }
         gifView.setImage(images[0]);
         descLbl.setText(tutMessages[0]);
@@ -78,4 +78,8 @@ public class UMLTutController extends Controller{
         descLbl.setText(tutMessages[tutCounter]);
     }
 
+    @Override
+    String generateAI(String prompt) {
+        return "";
+    }
 }

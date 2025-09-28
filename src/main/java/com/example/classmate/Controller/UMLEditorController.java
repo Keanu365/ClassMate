@@ -15,7 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
-import org.fxmisc.richtext.InlineCssTextArea;
+import javafx.stage.FileChooser;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
@@ -100,7 +100,7 @@ public class UMLEditorController extends Controller{
             double currentTranslateY = 5000;
             ObservableList<Node> children = contentPane.getChildren();
             for (UMLClass uc : umlClasses) {
-                if (uc.getName().equals("null")) continue;
+                if (uc.getName().startsWith("null")) continue;
                 currentTranslateX += spacing;
                 UMLBox ub = new UMLBox(uc);
                 for (Node node : children){
@@ -182,12 +182,21 @@ public class UMLEditorController extends Controller{
         ));
         WritableImage image = contentPane.snapshot(params, null);
         try {
-            //TODO: Save to user selected directory.
-            File outputFile = new File("scrollPane_content.png");
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Save UML Diagram");
+            fc.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("PNG Image", "*.png")
+            );
+            File outputFile = fc.showSaveDialog(saveBtn.getScene().getWindow());
+            if (outputFile == null) throw new Exception("Please choose a file!");
+            if (!outputFile.getName().toLowerCase().endsWith(".png")) {
+                outputFile = new File(outputFile.getAbsolutePath() + ".png");
+            }
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", outputFile);
-            System.out.println("Image saved successfully!");
+            showAlert(Alert.AlertType.INFORMATION, "ClassMate - Save Successful", "Image Saved Successfully",
+                    "Your image has been saved as " + outputFile.getName(), false);
         } catch (Exception e) {
-            System.err.println("Error saving image: " + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "ClassMate - Save Error", "Error in saving file", e.getMessage(), false);
         }
     }
 
@@ -369,29 +378,18 @@ public class UMLEditorController extends Controller{
         propBox1.setVisible(showBox1);
         propBox2.setVisible(showBox2);
         if (node instanceof UMLBox umlBox){
-            BorderStroke strokes = umlBox.getBorder().getStrokes().getFirst();
-            borderColorPicker.setValue((Color) strokes.getTopStroke());
-            borderWidthField.setText(strokes.getWidths().getTop() * 1 + "");
-            InlineCssTextArea textArea = (InlineCssTextArea) umlBox.getChildrenUnmodifiable().getFirst();
+            borderColorPicker.setValue(umlBox.getBorderColor());
+            borderWidthField.setText(umlBox.getBorderWidth() + "");
             fontColorPicker.setValue(umlBox.getFontColor());
-            //Find font size
-            int start = textArea.getStyle().lastIndexOf("-fx-font-size:") + 14;
-            int end = textArea.getStyle().indexOf("p", start); //We will always be using px
-            fontSizeField.setText(Double.parseDouble(textArea.getStyle().substring(start, end).replace(" ","")) + "");
+            fontSizeField.setText(umlBox.getFontSize() + "");
             borderColorPicker.setOnAction(_ -> {
                 Color newColor = borderColorPicker.getValue();
-                String css = String.format("rgb(%d,%d,%d);",
-                        (int)(newColor.getRed() * 255),
-                        (int)(newColor.getGreen() * 255),
-                        (int)(newColor.getBlue() * 255));
-                umlBox.setStyle(umlBox.getStyle() + "; -fx-border-color: " + css);
+                umlBox.setBorderColor(newColor);
             });
             borderWidthField.setOnAction(_ -> {
                 try {
-                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
-                    double borderWidth = Double.parseDouble(borderWidthField.getText());
-                    umlBox.setStyle(umlBox.getStyle() + "; -fx-border-width: " + borderWidth + "px");
-//                    umlBox.updatePrefHeight(borderWidth);
+                    if (!borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
+                    umlBox.setBorderWidth(Double.parseDouble(borderWidthField.getText()));
                 } catch (IllegalArgumentException e) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
                 } catch (Exception e) {
@@ -404,13 +402,9 @@ public class UMLEditorController extends Controller{
             });
             fontSizeField.setOnAction(_ -> {
                 try {
-                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
-                    double size = Double.parseDouble(fontSizeField.getText());
-                    for (Node n: umlBox.getChildren()){
-                        InlineCssTextArea ta = (InlineCssTextArea) n;
-                        ta.setStyle(ta.getStyle() + "; -fx-font-size: " + size + "px");
-//                        umlBox.updatePrefHeight();
-                    }
+                    if (!borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
+                    umlBox.setFontSize(Double.parseDouble(fontSizeField.getText()));
+
                 } catch (IllegalArgumentException e) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
                 } catch (Exception e) {
@@ -423,7 +417,7 @@ public class UMLEditorController extends Controller{
             borderColorPicker.setOnAction(_ -> arrow.setStrokeColor(borderColorPicker.getValue()));
             borderWidthField.setOnAction(_ -> {
                 try {
-                    if (borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
+                    if (!borderWidthField.getText().matches(regex)) throw new IllegalArgumentException();
                     arrow.setStrokeWidth(Double.parseDouble(borderWidthField.getText()));
                 } catch (IllegalArgumentException e) {
                     showAlert(Alert.AlertType.ERROR, "ClassMate - Input Error", "Error in input!", "Please only enter a number greater than 0!", false);
@@ -450,5 +444,10 @@ public class UMLEditorController extends Controller{
             gridPane.setOnKeyPressed(this::checkKeyPress);
             if (node instanceof PolyArrow arrow) arrow.detach();
         }
+    }
+
+    @Override
+    String generateAI(String prompt) {
+        return "";
     }
 }
