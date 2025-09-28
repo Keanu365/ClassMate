@@ -1,8 +1,6 @@
 package com.example.classmate.Controller;
 
-import com.google.genai.Client;
-import com.google.genai.types.GenerateContentResponse;
-import javafx.animation.FadeTransition;
+import com.example.classmate.HelloApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -12,19 +10,19 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public abstract class Controller {
 
     @FXML
-    void menu(MouseEvent event) throws IOException {
+    void menu(MouseEvent event) {
         //TODO: Cool animation
         Node source = (Node)event.getSource();
         Scene scene = source.getScene();
         Stage stage = (Stage)scene.getWindow();
-        showScene(stage, "ClassMate", "/com/example/classmate/View/main-menu.fxml");
+        stage.close();
     }
 
     static void showScene(Stage stage, String title, String path) throws IOException {
@@ -32,12 +30,12 @@ public abstract class Controller {
     }
 
     static void showScene(Stage stage, String title, String path, double w, double h) throws IOException {
-        //Stage stage = new Stage();
-        Parent root = FXMLLoader.load(Controller.class.getResource(path));
+        Parent root = FXMLLoader.load(HelloApplication.class.getResource(path));
         stage.setScene(new Scene(root));
         stage.setTitle(title);
         stage.getIcons().add(new javafx.scene.image.Image("file:" + System.getProperty("user.dir") + "/src/main/resources/com/example/classmate/View/icon.png"));
-
+        stage.setResizable(false);
+        stage.setFullScreen(true);
         stage.setWidth(w);
         stage.setHeight(h);
         stage.show();
@@ -60,24 +58,5 @@ public abstract class Controller {
         }
     }
 
-    static String generateAI(String prompt){
-        Client client = new Client();
-
-        GenerateContentResponse response =
-                client.models.generateContent(
-                        "gemini-2.5-flash",
-                        "You are an AI assistant named ClassMate designed to help users with their programming issues, particularly in Java. Please avoid unnecessary formatting such as bolding or underlining. How would you respond to the following question?\n" + prompt,
-                        null);
-
-        return response.text();
-    }
-
-    static void fadeScene(Scene scene, int fromValue, double duration){
-        FadeTransition ft = new FadeTransition(Duration.millis(duration), scene.getRoot());
-        ft.setFromValue(fromValue);
-        ft.setToValue(1 - fromValue);
-        ft.play();
-    }
-
-    static void fadeScene(Scene scene, int fromValue) {fadeScene(scene, fromValue, 10000);}
+    abstract String generateAI(String prompt);
 }

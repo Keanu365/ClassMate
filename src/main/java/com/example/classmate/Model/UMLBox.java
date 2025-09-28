@@ -17,6 +17,9 @@ import java.util.List;
 
 public class UMLBox extends VBox implements Selectable, Resizable {
     public Color fontColor = Color.BLACK;
+    public double fontSize = 12;
+    public Color borderColor = Color.BLACK;
+    public double borderWidth = 1;
     public PolyArrow arrow = null;
     private boolean isInterface = false;
 
@@ -59,11 +62,11 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                         this.isInterface = textArea.getText().startsWith("<<interface>>"));
             } else textArea.setOnKeyPressed(keyEvent -> {
                 if (keyEvent.getCode() == KeyCode.ENTER) {
-                    this.underlineStatics();
+                    this.format();
                 }
             });
             this.getChildren().add(textArea);
-            Platform.runLater(this::underlineStatics);
+            Platform.runLater(this::format);
         }
         new DraggableMaker().makeDraggable(this);
         DoubleProperty[] properties = new DoubleProperty[3];
@@ -76,30 +79,36 @@ public class UMLBox extends VBox implements Selectable, Resizable {
 
     List<String> fieldsToUnderline = new ArrayList<>();
     List<String> methodsToUnderline = new ArrayList<>();
-    private void underlineStatics(){
+    List<String> methodsToItalicise = new ArrayList<>();
+    private void format(){
         for (Node node : this.getChildren()){
-            if (node.equals(this.getChildren().getFirst())) continue;
             List<String> toUnderline;
             if (node.equals(this.getChildren().get(1))) toUnderline = fieldsToUnderline;
             else toUnderline = methodsToUnderline;
             InlineCssTextArea textArea = (InlineCssTextArea) node;
-            textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false;");
-            while (textArea.getText().contains("{s}")) {
-                int start = textArea.getText().indexOf("{s}");
-                textArea.replaceText(textArea.getText().replaceFirst("\\{s}", ""));
-                int end = textArea.getText().indexOf("{s}", start);
-                textArea.replaceText(textArea.getText().replaceFirst("\\{s}", ""));
-                toUnderline.add(textArea.getText().substring(start, end));
+            textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false; -fx-font-style: normal;");
+            if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
+            if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
+        }
+    }
+    private void formatHelper(InlineCssTextArea textArea, List<String> toFormat, String matchStr, String matchRegex, String style){
+        Platform.runLater(() -> {
+            while (textArea.getText().contains(matchStr)) {
+                int start = textArea.getText().indexOf(matchStr);
+                textArea.replaceText(textArea.getText().replaceFirst(matchRegex, ""));
+                int end = textArea.getText().indexOf(matchStr, start);
+                textArea.replaceText(textArea.getText().replaceFirst(matchRegex, ""));
+                toFormat.add(textArea.getText().substring(start, end));
             }
-            for (String string : toUnderline) {
+            for (String string : toFormat) {
                 int start = textArea.getText().indexOf(string);
                 if (start == -1) {
-                    toUnderline.remove(string);
+                    toFormat.remove(string);
                     continue;
                 }
-                textArea.setStyle(start, start + string.length(), "-fx-underline: true;");
+                textArea.setStyle(start, start + string.length(), style);
             }
-        }
+        });
     }
 
     public boolean isInterface(){return this.isInterface;}
@@ -184,6 +193,40 @@ public class UMLBox extends VBox implements Selectable, Resizable {
             InlineCssTextArea textArea = (InlineCssTextArea) node;
             textArea.setStyle(0, textArea.getText().length(), css);
         }
+    }
+
+    public double getFontSize(){return this.fontSize;}
+    public void setFontSize(double fontSize){
+        this.fontSize = fontSize;
+        String css = "-fx-font-size: " + fontSize + "px;";
+        for (Node n: this.getChildren()){
+            InlineCssTextArea ta = (InlineCssTextArea) n;
+            ta.setStyle(ta.getStyle() + css);
+        }
+    }
+
+    public double getBorderWidth(){return this.borderWidth;}
+    public void setBorderWidth(double width){
+        this.borderWidth = width;
+        BorderStroke borderStroke = new BorderStroke(
+                borderColor,                      // stroke color
+                BorderStrokeStyle.SOLID,          // stroke style
+                null,                             // rounded corners
+                new BorderWidths(width)           // thickness (2px)
+        );
+        this.setBorder(new Border(borderStroke));
+    }
+
+    public Color getBorderColor(){return this.borderColor;}
+    public void setBorderColor(Color newColor){
+        this.borderColor = newColor;
+        BorderStroke borderStroke = new BorderStroke(
+                borderColor,                      // stroke color
+                BorderStrokeStyle.SOLID,          // stroke style
+                null,                             // rounded corners
+                new BorderWidths(borderWidth)           // thickness (2px)
+        );
+        this.setBorder(new Border(borderStroke));
     }
 
     public enum Midpoint {

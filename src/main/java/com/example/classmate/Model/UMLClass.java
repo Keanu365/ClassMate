@@ -62,9 +62,6 @@ public class UMLClass {
     public Class<?> getUMLClass(){
         return this.c;
     }
-    public void setUMLClass(Class<?> c){
-        this.c = c;
-    }
 
     public boolean isSimpleNames(){return this.simpleNames;}
     public void setSimpleNames(boolean sn){this.simpleNames = sn;}

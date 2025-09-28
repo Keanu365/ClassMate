@@ -1,5 +1,6 @@
 package com.example.classmate.Controller;
 
+import com.example.classmate.HelloApplication;
 import com.example.classmate.Model.UMLClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -42,19 +43,21 @@ public class UMLController extends Controller{
     static UMLClass[] umlClasses;
 
     @FXML
+    public void initialize(){umlClasses = null;}
+
+    @FXML
     void generate(MouseEvent event) throws IOException {
         Stage stage = new Stage();
         stage.setTitle("ClassMate - UML Diagram Editor");
         stage.getIcons().add(new javafx.scene.image.Image("file:" + System.getProperty("user.dir") + "/src/main/resources/com/example/classmate/View/icon.png"));
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/classmate/View/uml-editor-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("View/splash-screen.fxml"));
+        SplashScreenController.fxmlToShow = "View/uml-editor-view.fxml";
+        SplashScreenController.title = "ClassMate - UML Diagram Editor";
         Parent root = loader.load();
-        UMLEditorController controller = loader.getController();
-
         Scene scene = new Scene(root);
-        scene.setUserData(controller);
-
         stage.setScene(scene);
         stage.show();
+        ((Stage) generateBtn.getScene().getWindow()).close();
     }
 
     @FXML
@@ -70,23 +73,25 @@ public class UMLController extends Controller{
                 Class<?>[] classes = UMLClass.loadFolder(folder);
                 umlClasses = new UMLClass[classes.length];
                 for (int i = 0; i < classes.length; i++) {
-                    umlClasses[i] = new  UMLClass(classes[i]);
+                    umlClasses[i] = new UMLClass(classes[i]);
                 }
             }catch (Exception e){
-                e.printStackTrace();
+                System.err.println("An error occurred.");
             }
         }
     }
 
     @FXML
     void instructions(MouseEvent event) {
-        //TODO #2: Fix UMLClass.loadFolder() code
-        //TODO #3: Scene transition animation
         try {
-            showScene(new Stage(), "ClassMate - UML Diagram Generator - What to upload?", "/com/example/classmate/View/uml-tut-view.fxml");
+            showScene(new Stage(), "ClassMate - UML Diagram Generator - What to upload?", "View/uml-tut-view.fxml");
         }catch (Exception e){
             System.out.println("File not found.");
         }
     }
 
+    @Override
+    String generateAI(String prompt) {
+        return "";
+    }
 }

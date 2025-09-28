@@ -1,5 +1,7 @@
 package com.example.classmate.Controller;
 
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -75,4 +77,16 @@ public class AIController extends Controller{
         return label;
     }
 
+    @Override
+    String generateAI(String prompt) {
+        Client client = new Client();
+
+        GenerateContentResponse response =
+                client.models.generateContent(
+                        "gemini-2.5-flash",
+                        "You are an AI assistant named ClassMate designed to help users with their programming issues, particularly in Java. Please avoid unnecessary formatting such as bolding or underlining. How would you respond to the following question?\n" + prompt,
+                        null);
+
+        return response.text();
+    }
 }

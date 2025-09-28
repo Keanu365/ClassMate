@@ -2,10 +2,11 @@ package com.example.classmate.Controller;
 
 import javafx.animation.ScaleTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -25,23 +26,23 @@ public class MainController extends Controller{
     private Button umlGenBtn;
 
     @FXML
-    void loadAiScene(MouseEvent event) throws IOException {
-        Node source = (Node)event.getSource();
-        Scene scene = source.getScene();
-        scene.getStylesheets().add(getClass().getResource("/com/example/classmate/View/styles.css").toExternalForm());
-        Stage stage = (Stage)scene.getWindow();
-        fadeScene(scene, 1);
-        showScene(stage, "ClassMate - AI Buddy", "/com/example/classmate/View/ai-view.fxml");
+    public void initialize(){
+        Platform.runLater(()->{
+            aiBuddyBtn.getScene().getWindow().setWidth(480);
+            mmGenBtn.getScene().getWindow().setHeight(640);
+            ((Stage) umlGenBtn.getScene().getWindow()).setResizable(false);
+            ((Stage) umlGenBtn.getScene().getWindow()).setFullScreen(false);
+        });
     }
 
     @FXML
-    void loadUMLScene(MouseEvent event) throws IOException {
-        Node source = (Node)event.getSource();
-        Scene scene = source.getScene();
-        scene.getStylesheets().add(getClass().getResource("/com/example/classmate/View/styles.css").toExternalForm());
-        Stage stage = (Stage)scene.getWindow();
-        fadeScene(scene, 1);
-        showScene(stage, "ClassMate - UML Diagram Generator", "/com/example/classmate/View/uml-view.fxml");
+    void loadAiScene(MouseEvent ignore) throws IOException {
+        showScene(new Stage(), "ClassMate - AI Buddy", "View/ai-view.fxml");
+    }
+
+    @FXML
+    void loadUMLScene(MouseEvent ignore) throws IOException {
+        showScene(new Stage(), "ClassMate - UML Diagram Generator", "View/uml-view.fxml");
     }
 
     @FXML
@@ -53,7 +54,6 @@ public class MainController extends Controller{
                 if (n != sourceBtn) {
                     TranslateTransition tt = new TranslateTransition(Duration.millis(100), n);
                     tt.setToY(n.getLayoutY() > sourceBtn.getLayoutY() ? 10f : -10f);
-                    //tt.setInterpolator(Interpolator.EASE_OUT);
                     tt.play();
                 }
             }
@@ -61,7 +61,6 @@ public class MainController extends Controller{
         ScaleTransition st = new ScaleTransition(Duration.millis(100), sourceBtn);
         st.setToX(1.25f);
         st.setToY(1.25f);
-        //st.setInterpolator(Interpolator.EASE_OUT);
         st.play();
     }
 
@@ -74,7 +73,6 @@ public class MainController extends Controller{
                 if (n != sourceBtn) {
                     TranslateTransition tt = new TranslateTransition(Duration.millis(100), n);
                     tt.setToY(0f);
-                    //tt.setInterpolator(Interpolator.EASE_OUT);
                     tt.play();
                 }
             }
@@ -82,8 +80,16 @@ public class MainController extends Controller{
         ScaleTransition st = new ScaleTransition(Duration.millis(100), sourceBtn);
         st.setToX(1f);
         st.setToY(1f);
-        //st.setInterpolator(Interpolator.EASE_OUT);
         st.play();
     }
 
+    @FXML
+    void showMMScene(MouseEvent ignore) {
+        showAlert(Alert.AlertType.INFORMATION, "ClassMate - Future Development", "Sorry, Work in Progress!", "Stay tuned for future updates!", false);
+    }
+
+    @Override
+    String generateAI(String prompt) {
+        return "";
+    }
 }

@@ -209,6 +209,17 @@
             <Insets />
          </GridPane.margin>
       </StackPane>
-      <Button fx:id="saveBtn" mnemonicParsing="false" onMouseClicked="#save" text="Button" GridPane.rowIndex="2" />
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
+         <children>
+            <Button fx:id="saveBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#save" styleClass="main_btn" text="Save as PNG" HBox.hgrow="ALWAYS">
+               <HBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </HBox>
    </children>
 </GridPane>
