@@ -86,7 +86,7 @@ public class UMLController extends Controller{
         try {
             showScene(new Stage(), "ClassMate - UML Diagram Generator - What to upload?", "View/uml-tut-view.fxml");
         }catch (Exception e){
-            System.out.println("File not found.");
+            e.printStackTrace();
         }
     }
 

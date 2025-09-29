@@ -1,5 +1,6 @@
 package com.example.classmate.Controller;
 
+import com.example.classmate.HelloApplication;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -9,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
 
 public class UMLTutController extends Controller{
     @FXML
@@ -41,7 +43,7 @@ public class UMLTutController extends Controller{
     @FXML
     void initialize(){
         for (int i = 0; i < images.length; i++) {
-            images[i] = new Image(getClass().getResource(System.getProperty("user.dir") + "/com/example/classmate/View/TutGIFS/GIF" + i + ".gif").toExternalForm());
+            images[i] = new Image(HelloApplication.class.getResource("View/TutGifs/GIF" + i + ".gif").toExternalForm());
         }
         gifView.setImage(images[0]);
         descLbl.setText(tutMessages[0]);

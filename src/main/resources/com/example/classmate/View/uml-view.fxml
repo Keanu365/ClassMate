@@ -173,7 +173,7 @@
       </VBox>
       <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.rowIndex="2">
          <children>
-            <Label onMouseClicked="#menu" styleClass="label1" text="Options">
+            <Label onMouseClicked="#menu" styleClass="label1" text="Options" visible="false">
                <textFill>
                   <LinearGradient endX="1.0" endY="1.0">
                      <stops>
@@ -205,7 +205,7 @@
                   <Bloom />
                </effect>
             </Label>
-            <HBox layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" spacing="10.0">
+            <HBox layoutX="10.0" layoutY="10.0" maxWidth="1.7976931348623157E308" spacing="10.0" visible="false">
                <children>
                   <CheckBox fx:id="simpleNamesCheckbox" mnemonicParsing="false" styleClass="label1" text="Simple names">
                      <font>
@@ -225,7 +225,7 @@
                   </Label>
                </children>
             </HBox>
-            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="45.0" maxWidth="1.7976931348623157E308" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="45.0" maxWidth="1.7976931348623157E308" spacing="10.0" visible="false">
                <children>
                   <Label styleClass="label1" text="Diagram Color">
                      <font>

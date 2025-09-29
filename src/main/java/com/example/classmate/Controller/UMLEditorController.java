@@ -174,12 +174,17 @@ public class UMLEditorController extends Controller{
         Bounds bounds = getContentBounds(contentPane);
 
         SnapshotParameters params = new SnapshotParameters();
-        params.setViewport(new Rectangle2D(
-                bounds.getMinX()-10.0,
-                bounds.getMinY()-10.0,
-                bounds.getWidth()+20.0,
-                bounds.getHeight()+20.0
-        ));
+        try {
+            params.setViewport(new Rectangle2D(
+                    bounds.getMinX()-10.0,
+                    bounds.getMinY()-10.0,
+                    bounds.getWidth()+20.0,
+                    bounds.getHeight()+20.0
+            ));
+        } catch (IllegalArgumentException e) {
+            showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "No content to save", "There is no content to save. Please add content before saving.", false);
+            return;
+        }
         WritableImage image = contentPane.snapshot(params, null);
         try {
             FileChooser fc = new FileChooser();
