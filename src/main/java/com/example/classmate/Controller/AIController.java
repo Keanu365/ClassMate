@@ -18,7 +18,6 @@ public class AIController extends Controller{
     @FXML
     void initialize(){
         chatAreaPane.widthProperty().addListener((_, _, _) -> {
-            //System.out.println("Scene Width changed from " + oldValue + " to " + newValue);
             chatArea.setPrefWidth(chatAreaPane.getWidth()-15);
         });
         submitBtn.disableProperty().bind(userTextField.textProperty().isEmpty());
