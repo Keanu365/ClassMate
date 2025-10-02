@@ -222,41 +222,40 @@ public class UMLEditorController extends Controller{
         });
         for (Node node : contentPane.getChildren()) {
             //Recursion to get "from" and "to", then draw a PolyArrow.
-            if (node instanceof UMLBox ub) {
-                ub.setOnMouseClicked(e -> {
-                    UMLBox from = (UMLBox) e.getSource();
-                    for (Node node1 : contentPane.getChildren()) {
-                        if (node1 instanceof UMLBox ub1) {
-                            ub1.setOnMouseClicked(e1 -> {
-                                UMLBox to = (UMLBox) e1.getSource();
-                                try {
-                                    if (from == to) throw new Exception("Arrow cannot be drawn to and from the same box!");
-                                    PolyArrow arrow = new PolyArrow(from, to);
-                                    ArrayList<PolyArrow> others = new ArrayList<>();
-                                    for (Node node2 : contentPane.getChildren()) {
-                                        if (node2 instanceof PolyArrow other) {
-                                            if (arrow.equals(other)) throw new Exception("This arrow has already been drawn!");
-                                            others.add(other);
-                                        }
+            if (!(node instanceof UMLBox ub)) continue;
+            ub.setOnMouseClicked(e -> {
+                UMLBox from = (UMLBox) e.getSource();
+                for (Node node1 : contentPane.getChildren()) {
+                    if (node1 instanceof UMLBox ub1) {
+                        ub1.setOnMouseClicked(e1 -> {
+                            UMLBox to = (UMLBox) e1.getSource();
+                            try {
+                                if (from == to) throw new Exception("Arrow cannot be drawn to and from the same box!");
+                                PolyArrow arrow = new PolyArrow(from, to);
+                                ArrayList<PolyArrow> others = new ArrayList<>();
+                                for (Node node2 : contentPane.getChildren()) {
+                                    if (node2 instanceof PolyArrow other) {
+                                        if (arrow.equals(other)) throw new Exception("This arrow has already been drawn!");
+                                        others.add(other);
                                     }
-                                    if (arrow.checkCyclic(others.toArray(new PolyArrow[0]))){
-                                        boolean draw = showAlert(Alert.AlertType.WARNING, "Arrow Drawing - Warning", "Cyclic Relationship Warning", "Warning: Drawing this arrow will result in a cyclic relationship! Do you wish to proceed?", true);
-                                        if (draw) contentPane.getChildren().add(arrow);
-                                    }else contentPane.getChildren().add(arrow);
-                                } catch (Exception ex) {
-                                    showAlert(Alert.AlertType.ERROR, "Arrow Drawing - Error", "Arrow Drawing Operation Cancelled", ex.getMessage(), false);
-                                } finally {
-                                    for (Node node2 : stackPane.getChildren()) {
-                                        node2.setDisable(false);
-                                        setEditMode(editMode);
-                                    }
-                                    gridPane.setOnKeyPressed(this::checkKeyPress);
                                 }
-                            });
-                        }
+                                if (arrow.checkCyclic(others.toArray(new PolyArrow[0]))){
+                                    boolean draw = showAlert(Alert.AlertType.WARNING, "Arrow Drawing - Warning", "Cyclic Relationship Warning", "Warning: Drawing this arrow will result in a cyclic relationship! Do you wish to proceed?", true);
+                                    if (draw) contentPane.getChildren().add(arrow);
+                                }else contentPane.getChildren().add(arrow);
+                            } catch (Exception ex) {
+                                showAlert(Alert.AlertType.ERROR, "Arrow Drawing - Error", "Arrow Drawing Operation Cancelled", ex.getMessage(), false);
+                            } finally {
+                                for (Node node2 : stackPane.getChildren()) {
+                                    node2.setDisable(false);
+                                    setEditMode(editMode);
+                                }
+                                gridPane.setOnKeyPressed(this::checkKeyPress);
+                            }
+                        });
                     }
-                });
-            }
+                }
+            });
         }
     }
 
