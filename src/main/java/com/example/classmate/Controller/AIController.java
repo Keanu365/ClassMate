@@ -10,18 +10,10 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 
 public class AIController extends Controller{
-
-    @FXML
-    private VBox chatArea;
-
-    @FXML
-    private Button submitBtn;
-
-    @FXML
-    private TextField userTextField;
-
-    @FXML
-    private ScrollPane chatAreaPane;
+    @FXML private VBox chatArea;
+    @FXML private Button submitBtn;
+    @FXML private TextField userTextField;
+    @FXML private ScrollPane chatAreaPane;
 
     @FXML
     void initialize(){

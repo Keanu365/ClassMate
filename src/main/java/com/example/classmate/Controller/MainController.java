@@ -15,15 +15,9 @@ import javafx.util.Duration;
 import java.io.IOException;
 
 public class MainController extends Controller{
-
-    @FXML
-    private Button aiBuddyBtn;
-
-    @FXML
-    private Button mmGenBtn;
-
-    @FXML
-    private Button umlGenBtn;
+    @FXML private Button aiBuddyBtn;
+    @FXML private Button mmGenBtn;
+    @FXML private Button umlGenBtn;
 
     @FXML
     public void initialize(){

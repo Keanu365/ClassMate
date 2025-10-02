@@ -17,12 +17,8 @@ import java.io.IOException;
 public class SplashScreenController {
     public static String fxmlToShow = "View/main-menu.fxml";
     public static String title = "ClassMate";
-
-    @FXML
-    private ImageView logo;
-
-    @FXML
-    private ProgressBar progressBar;
+    @FXML private ImageView logo;
+    @FXML private ProgressBar progressBar;
 
     @FXML
     public void initialize() {

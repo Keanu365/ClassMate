@@ -6,9 +6,7 @@ import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class AboutController {
-
-    @FXML
-    private Button closeBtn;
+    @FXML private Button closeBtn;
 
     @FXML
     void handleClose(ActionEvent event) {
