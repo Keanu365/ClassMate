@@ -29,59 +29,27 @@ import java.io.*;
 import java.util.*;
 
 public class UMLEditorController extends Controller{
-
-    @FXML
-    private Label arrowLbl;
-
-    @FXML
-    private Label backBtn;
-
-    @FXML
-    private Label umlBoxLbl;
-
-    @FXML
-    private ScrollPane scrollPane;
-
-    @FXML
-    private Button saveBtn;
-
-    @FXML
-    private Pane contentPane;
-
-    @FXML
-    private GridPane gridPane;
-
-    @FXML
-    private Button delBtn;
-
-    @FXML
-    private StackPane stackPane;
-
-    @FXML
-    private ColorPicker borderColorPicker;
-    @FXML
-    private TextField borderWidthField;
-    @FXML
-    private ColorPicker fontColorPicker;
-    @FXML
-    private TextField fontSizeField;
-    @FXML
-    private VBox propBox1;
-    @FXML
-    private VBox propBox2;
-    @FXML
-    private Label propertiesLbl;
-
-    @FXML
-    private ToggleButton selectToggle;
-    @FXML
-    private ToggleButton moveToggle;
-    @FXML
-    private ToggleButton panToggle;
-    @FXML
-    private ToggleButton editTextToggle;
-    @FXML
-    private ToggleButton resizeToggle;
+    @FXML private Label arrowLbl;
+    @FXML private Label backBtn;
+    @FXML private Label umlBoxLbl;
+    @FXML private ScrollPane scrollPane;
+    @FXML private Button saveBtn;
+    @FXML private Pane contentPane;
+    @FXML private GridPane gridPane;
+    @FXML private Button delBtn;
+    @FXML private StackPane stackPane;
+    @FXML private ColorPicker borderColorPicker;
+    @FXML private TextField borderWidthField;
+    @FXML private ColorPicker fontColorPicker;
+    @FXML private TextField fontSizeField;
+    @FXML private VBox propBox1;
+    @FXML private VBox propBox2;
+    @FXML private Label propertiesLbl;
+    @FXML private ToggleButton selectToggle;
+    @FXML private ToggleButton moveToggle;
+    @FXML private ToggleButton panToggle;
+    @FXML private ToggleButton editTextToggle;
+    @FXML private ToggleButton resizeToggle;
     private final ArrayList<ToggleButton> modeToggles = new ArrayList<>(5);
 
     EditMode editMode;
@@ -94,8 +62,8 @@ public class UMLEditorController extends Controller{
         dm.makeDraggable(umlBoxLbl, true);
         contentPane.setPrefSize(10000, 10000);
 
-        if (UMLController.umlClasses != null) {
-            ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLController.umlClasses));
+        if (UMLMenuController.umlClasses != null) {
+            ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLMenuController.umlClasses));
             double currentTranslateX = 4000 - spacing;
             double currentTranslateY = 5000;
             ObservableList<Node> children = contentPane.getChildren();

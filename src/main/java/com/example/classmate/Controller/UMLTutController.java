@@ -13,23 +13,12 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class UMLTutController extends Controller{
-    @FXML
-    private GridPane gridPane;
-
-    @FXML
-    private Label exitBtn;
-
-    @FXML
-    private Label descLbl;
-
-    @FXML
-    private ImageView gifView;
-
-    @FXML
-    private Label nextBtn;
-
-    @FXML
-    private Label prevBtn;
+    @FXML private GridPane gridPane;
+    @FXML private Label exitBtn;
+    @FXML private Label descLbl;
+    @FXML private ImageView gifView;
+    @FXML private Label nextBtn;
+    @FXML private Label prevBtn;
 
     private int tutCounter = 0;
     private final String[] tutMessages = {

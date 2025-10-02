@@ -14,31 +14,15 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 
-public class UMLController extends Controller{
-
-    @FXML
-    private Label backBtn;
-
-    @FXML
-    private ColorPicker colorPicker;
-
-    @FXML
-    private Button generateBtn;
-
-    @FXML
-    private Label selectedFolderLbl;
-
-    @FXML
-    private CheckBox simpleNamesCheckbox;
-
-    @FXML
-    private Label simpleNamesLbl;
-
-    @FXML
-    private Button uploadBtn;
-
-    @FXML
-    private Button instructionsBtn;
+public class UMLMenuController extends Controller{
+    @FXML private Label backBtn;
+    @FXML private ColorPicker colorPicker;
+    @FXML private Button generateBtn;
+    @FXML private Label selectedFolderLbl;
+    @FXML private CheckBox simpleNamesCheckbox;
+    @FXML private Label simpleNamesLbl;
+    @FXML private Button uploadBtn;
+    @FXML private Button instructionsBtn;
 
     static UMLClass[] umlClasses;
 
