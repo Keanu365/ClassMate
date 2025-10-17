@@ -15,7 +15,7 @@ import org.fxmisc.richtext.InlineCssTextArea;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UMLBox extends VBox implements Selectable, Resizable {
+public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     public Color fontColor = Color.BLACK;
     public double fontSize = 12;
     public Color borderColor = Color.BLACK;
@@ -80,8 +80,9 @@ public class UMLBox extends VBox implements Selectable, Resizable {
     List<String> fieldsToUnderline = new ArrayList<>();
     List<String> methodsToUnderline = new ArrayList<>();
     List<String> methodsToItalicise = new ArrayList<>();
-    private void format(){
+    public void format(){
         for (Node node : this.getChildren()){
+            //Format inside InlineCSSTextArea
             List<String> toUnderline;
             if (node.equals(this.getChildren().get(1))) toUnderline = fieldsToUnderline;
             else toUnderline = methodsToUnderline;
@@ -89,6 +90,11 @@ public class UMLBox extends VBox implements Selectable, Resizable {
             textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false; -fx-font-style: normal;");
             if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
             if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
+            //Format other things
+            this.setFontColor(this.fontColor);
+            this.setFontSize(this.fontSize);
+            this.setBorderColor(this.borderColor);
+            this.setBorderWidth(this.borderWidth);
         }
     }
     private void formatHelper(InlineCssTextArea textArea, List<String> toFormat, String matchStr, String matchRegex, String style){
@@ -109,6 +115,17 @@ public class UMLBox extends VBox implements Selectable, Resizable {
                 textArea.setStyle(start, start + string.length(), style);
             }
         });
+    }
+
+    public String getFormat(){
+        return String.format("%f-%f-%f-%f&%f&%f-%f-%f-%f&%f&%s&%s&%s",
+                fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getOpacity(),
+                fontSize,
+                borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getOpacity(),
+                borderWidth,
+                fieldsToUnderline,
+                methodsToUnderline,
+                methodsToItalicise);
     }
 
     public boolean isInterface(){return this.isInterface;}
