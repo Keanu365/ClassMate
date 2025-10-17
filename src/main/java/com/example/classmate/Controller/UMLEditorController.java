@@ -3,28 +3,22 @@ package com.example.classmate.Controller;
 import com.example.classmate.Model.*;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyCode;
-import javafx.stage.FileChooser;
 import javafx.scene.control.TextField;
-import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
 
-import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.*;
 
@@ -61,6 +55,7 @@ public class UMLEditorController extends Controller{
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
         contentPane.setPrefSize(10000, 10000);
+        SaveDiagram.contentPane = contentPane;
 
         if (UMLMenuController.umlClasses != null) {
             ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLMenuController.umlClasses));
@@ -139,36 +134,24 @@ public class UMLEditorController extends Controller{
 
     @FXML
     public void save() {
-        Bounds bounds = getContentBounds(contentPane);
-
-        SnapshotParameters params = new SnapshotParameters();
-        try {
-            params.setViewport(new Rectangle2D(
-                    bounds.getMinX()-10.0,
-                    bounds.getMinY()-10.0,
-                    bounds.getWidth()+20.0,
-                    bounds.getHeight()+20.0
-            ));
-        } catch (IllegalArgumentException e) {
-            showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "No content to save", "There is no content to save. Please add content before saving.", false);
-            return;
-        }
-        WritableImage image = contentPane.snapshot(params, null);
-        try {
+        try{
             FileChooser fc = new FileChooser();
             fc.setTitle("Save UML Diagram");
-            fc.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("PNG Image", "*.png")
+            fc.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("PNG Image", "*.png"),
+                    new FileChooser.ExtensionFilter("ClassMate UML Diagram", "*.cmud")
             );
-            File outputFile = fc.showSaveDialog(saveBtn.getScene().getWindow());
-            if (outputFile == null) throw new Exception("Please choose a file!");
-            if (!outputFile.getName().toLowerCase().endsWith(".png")) {
-                outputFile = new File(outputFile.getAbsolutePath() + ".png");
+            File outputFile = fc.showSaveDialog(contentPane.getScene().getWindow());
+            if (outputFile == null) return;
+            if (outputFile.getName().toLowerCase().endsWith(".png")) {
+                SaveDiagram.saveAsPNG(outputFile);
+            }else if (outputFile.getName().toLowerCase().endsWith(".cmud")) {
+                SaveDiagram.saveAsCMUD(outputFile);
             }
-            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", outputFile);
-            showAlert(Alert.AlertType.INFORMATION, "ClassMate - Save Successful", "Image Saved Successfully",
-                    "Your image has been saved as " + outputFile.getName(), false);
-        } catch (Exception e) {
+            showAlert(Alert.AlertType.INFORMATION, "Classmate - UML Diagram Saved", "UML Diagram Saved", "Your UML Diagram has been saved as " + outputFile.getName(), false);
+        }catch(IllegalArgumentException e){
+            showAlert(Alert.AlertType.ERROR, "ClassMate - Error", "No content to save", "There is no content to save. Please add content before saving.", false);
+        }catch(Exception e){
             showAlert(Alert.AlertType.ERROR, "ClassMate - Save Error", "Error in saving file", e.getMessage(), false);
         }
     }
@@ -285,23 +268,6 @@ public class UMLEditorController extends Controller{
         setEditMode(editMode);
     }
 
-    private Bounds getContentBounds(Pane contentPane) {
-        double minX = Double.MAX_VALUE;
-        double minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE;
-        double maxY = Double.MIN_VALUE;
-
-        for (Node node : contentPane.getChildren()) {
-            Bounds b = node.getBoundsInParent();
-            minX = Math.min(minX, b.getMinX());
-            minY = Math.min(minY, b.getMinY());
-            maxX = Math.max(maxX, b.getMaxX());
-            maxY = Math.max(maxY, b.getMaxY());
-        }
-
-        return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
-    }
-
     private void setEditMode(EditMode editMode){
         switch(editMode){
             case SELECT:
@@ -415,6 +381,10 @@ public class UMLEditorController extends Controller{
             propBox2.setVisible(false);
             gridPane.setOnKeyPressed(this::checkKeyPress);
             if (node instanceof PolyArrow arrow) arrow.detach();
+            if (node instanceof UMLBox ub) {
+                ub.arrow.detach();
+                ((Pane) node.getParent()).getChildren().remove(ub.arrow);
+            }
         }
     }
 
