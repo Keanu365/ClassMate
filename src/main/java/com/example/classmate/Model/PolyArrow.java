@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 
-public class PolyArrow extends Group implements Selectable{
+public class PolyArrow extends Group implements Selectable, Formattable{
     private final Polyline arrow = new Polyline();
     private final Polygon arrowHead = new Polygon();
 
@@ -204,5 +204,15 @@ public class PolyArrow extends Group implements Selectable{
             }
         }
         return this.from == currentTo;
+    }
+
+    public void format() {this.updateArrow();}
+
+    public String getFormat() {
+        return String.format("A&%d&%d&%.3f-%.3f-%.3f-%.3f&%.3f",
+                this.from.id,
+                this.to.id,
+                strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue(), strokeColor.getOpacity(),
+                this.arrow.getStrokeWidth());
     }
 }

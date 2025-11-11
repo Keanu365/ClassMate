@@ -23,15 +23,19 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     public PolyArrow arrow = null;
     private boolean isInterface = false;
 
+    private static int idCounter = 0;
+    public final int id;
+
     public UMLBox() {
-        this("Name\n", "Fields\n", "Methods\n");
+        this("Name\n", "Fields\n", "Methods\n", idCounter++);
     }
     public UMLBox(UMLClass uc){
-        this(uc.getName(), uc.getFields(), uc.getMethods());
+        this(uc.getName(), uc.getFields(), uc.getMethods(), idCounter++);
         isInterface = uc.getUMLClass().isInterface();
     }
-    public UMLBox(String name, String fields, String methods) {
+    public UMLBox(String name, String fields, String methods, int id) {
         super();
+        this.id = id;
         //Border stuff :3
         BorderStroke borderStroke = new BorderStroke(
                 Color.BLACK,                      // stroke color
@@ -118,14 +122,24 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     }
 
     public String getFormat(){
-        return String.format("%f-%f-%f-%f&%f&%f-%f-%f-%f&%f&%s&%s&%s",
+        String name = ((InlineCssTextArea) this.getChildren().getFirst()).getText();
+        String fields = ((InlineCssTextArea) this.getChildren().get(1)).getText();
+        String methods = ((InlineCssTextArea) this.getChildren().getLast()).getText();
+        return String.format("B&%d&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f&%.3f&%s&%s&%s",// &Attribute, - is secondary delimiter
+                this.id,
                 fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getOpacity(),
                 fontSize,
                 borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getOpacity(),
                 borderWidth,
-                fieldsToUnderline,
-                methodsToUnderline,
-                methodsToItalicise);
+                this.getTranslateX(),
+                this.getTranslateY(),
+                textHelper(name),
+                textHelper(fields),
+                textHelper(methods));
+        //Must change this to include formatting
+    }
+    private String textHelper(String string){
+        return (string.length() <= 1 ? string : string.substring(0, string.length() - 1).replace("\n", "\\n"));
     }
 
     public boolean isInterface(){return this.isInterface;}
