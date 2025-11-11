@@ -57,7 +57,7 @@
             <Insets top="5.0" />
          </GridPane.margin>
       </HBox>
-      <StackPane fx:id="stackPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
+      <VBox fx:id="stackPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.rowIndex="1">
          <children>
             <Pane maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" StackPane.alignment="CENTER_LEFT">
                <StackPane.margin>
@@ -110,7 +110,7 @@
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
-      </StackPane>
+      </VBox>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2">
          <children>
             <Button fx:id="saveBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#save" styleClass="main_btn" text="Save as PNG" HBox.hgrow="ALWAYS">

@@ -15,28 +15,20 @@ import javafx.util.Duration;
 import java.io.IOException;
 
 public class MainController extends Controller{
-    @FXML private Button aiBuddyBtn;
-    @FXML private Button mmGenBtn;
     @FXML private Button umlGenBtn;
 
     @FXML
     public void initialize(){
         Platform.runLater(()->{
-            aiBuddyBtn.getScene().getWindow().setWidth(480);
-            mmGenBtn.getScene().getWindow().setHeight(640);
             ((Stage) umlGenBtn.getScene().getWindow()).setResizable(false);
             ((Stage) umlGenBtn.getScene().getWindow()).setFullScreen(false);
         });
     }
 
-    @FXML
-    void loadAiScene(MouseEvent ignore) throws IOException {
-        showScene(new Stage(), "ClassMate - AI Buddy", "View/ai-view.fxml");
-    }
 
     @FXML
     void loadUMLScene(MouseEvent ignore) throws IOException {
-        showScene(new Stage(), "ClassMate - UML Diagram Generator", "View/uml-view.fxml");
+        showScene(new Stage(), "ClassMate - UML Diagram Generator", "View/uml-view.fxml", false);
     }
 
     @FXML

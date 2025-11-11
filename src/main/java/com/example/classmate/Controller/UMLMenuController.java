@@ -42,11 +42,12 @@ public class UMLMenuController extends Controller{
         stage.setTitle("ClassMate - UML Diagram Editor");
         stage.getIcons().add(new javafx.scene.image.Image("file:" + System.getProperty("user.dir") + "/src/main/resources/com/example/classmate/View/icon.png"));
         FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("View/splash-screen.fxml"));
-        SplashScreenController.fxmlToShow = "View/uml-editor-view.fxml";
+        SplashScreenController.fxmlToShow = "View/uml-diagram.fxml";
         SplashScreenController.title = "ClassMate - UML Diagram Editor";
         Parent root = loader.load();
         Scene scene = new Scene(root);
         stage.setScene(scene);
+        stage.setFullScreen(false);
         stage.show();
         ((Stage) generateBtn.getScene().getWindow()).close();
     }

@@ -32,14 +32,15 @@ public class UMLEditorController extends Controller{
     @FXML private Pane contentPane;
     @FXML private GridPane gridPane;
     @FXML private Button delBtn;
-    @FXML private StackPane stackPane;
+    @FXML private VBox stackPane;
     @FXML private ColorPicker borderColorPicker;
     @FXML private TextField borderWidthField;
     @FXML private ColorPicker fontColorPicker;
     @FXML private TextField fontSizeField;
-    @FXML private HBox propBox1;
-    @FXML private HBox propBox2;
+    @FXML private VBox propBox1;
+    @FXML private VBox propBox2;
     @FXML private Label propertiesLbl;
+
     @FXML private ToggleButton selectToggle;
     @FXML private ToggleButton moveToggle;
     @FXML private ToggleButton panToggle;
@@ -58,7 +59,6 @@ public class UMLEditorController extends Controller{
 
     @FXML
     public void initialize(){
-        System.out.println("INIT");
         scrollPane.widthProperty().addListener((_, _, _) -> scrollPane.setPrefWidth(((Pane) scrollPane.getParent()).getWidth() - 150));
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
@@ -143,6 +143,8 @@ public class UMLEditorController extends Controller{
                 }
             }
         }
+
+
         Collections.addAll(modeToggles, selectToggle, moveToggle, panToggle,  editTextToggle, resizeToggle);
         umlBoxLbl.addEventHandler(MouseEvent.MOUSE_RELEASED, mouseEvent -> addElement(mouseEvent, new UMLBox()));
         editMode = EditMode.SELECT;

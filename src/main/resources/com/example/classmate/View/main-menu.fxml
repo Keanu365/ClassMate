@@ -53,28 +53,6 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button fx:id="mmGenBtn" alignment="CENTER" layoutX="40.0" layoutY="115.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#showMMScene" onMouseEntered="#btnHover" onMouseExited="#btnUnhover" prefHeight="50.0" style="-fx-background-radius: 15;" styleClass="main_btn" text="Mindmap Generator" textFill="#1e2a38">
-               <font>
-                  <Font name="Ink Free" size="24.0" />
-               </font>
-               <effect>
-                  <InnerShadow />
-               </effect>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
-            <Button fx:id="aiBuddyBtn" alignment="CENTER" layoutX="40.0" layoutY="150.0" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onMouseClicked="#loadAiScene" onMouseEntered="#btnHover" onMouseExited="#btnUnhover" prefHeight="50.0" style="-fx-background-radius: 15;" styleClass="main_btn" text="AI Buddy" textFill="#1e2a38">
-               <font>
-                  <Font name="Ink Free" size="24.0" />
-               </font>
-               <effect>
-                  <InnerShadow />
-               </effect>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Button>
          </children>
          <padding>
             <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
