@@ -1,18 +1,23 @@
 package com.example.classmate.Controller;
 
 import com.example.classmate.HelloApplication;
+import com.example.classmate.Model.PolyArrow;
+import com.example.classmate.Model.UMLBox;
 import com.example.classmate.Model.UMLClass;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 
 public class UMLMenuController extends Controller{
     @FXML private Label backBtn;
@@ -23,11 +28,13 @@ public class UMLMenuController extends Controller{
     @FXML private Label simpleNamesLbl;
     @FXML private Button uploadBtn;
     @FXML private Button instructionsBtn;
+    @FXML private Button loadCMUDBtn;
 
     static UMLClass[] umlClasses;
+    static File cmudFile;
 
     @FXML
-    public void initialize(){umlClasses = null;}
+    public void initialize(){umlClasses = null; cmudFile = null;}
 
     @FXML
     void generate(MouseEvent event) throws IOException {
@@ -59,6 +66,24 @@ public class UMLMenuController extends Controller{
                 for (int i = 0; i < classes.length; i++) {
                     umlClasses[i] = new UMLClass(classes[i]);
                 }
+            }catch (Exception e){
+                System.err.println("An error occurred.");
+            }
+        }
+    }
+
+    @FXML
+    void loadCMUD(MouseEvent event) {
+        FileChooser fc  = new FileChooser();
+        fc.setTitle("Select Folder");
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("ClassMate UML Diagram", "*.cmud")
+        );
+        File file = fc.showOpenDialog(uploadBtn.getScene().getWindow());
+        if (file != null){
+            try{
+                cmudFile = file;
+                generate(event);
             }catch (Exception e){
                 System.err.println("An error occurred.");
             }
