@@ -46,6 +46,7 @@ public class UMLEditorController extends Controller{
     @FXML private ToggleButton editTextToggle;
     @FXML private ToggleButton resizeToggle;
 
+    @FXML private Button bold;
     @FXML private Button italic;
     @FXML private Button underline;
     @FXML private Button clr;
@@ -137,7 +138,14 @@ public class UMLEditorController extends Controller{
         clr.setOnAction(e -> {
             InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
             for(InlineCssTextArea textArea:inlineCssTextAreas) {
-                UMLBox.formatSelected(textArea, "-fx-underline: false; -fx-font-style: normal;");
+                UMLBox.formatSelected(textArea, "-fx-underline: false; -fx-font-style: normal; -fx-font-weight:normal;");
+            }
+        });
+
+        bold.setOnAction( e -> {
+            InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
+            for(InlineCssTextArea textArea:inlineCssTextAreas) {
+                UMLBox.formatSelected(textArea, "-fx-font-weight:bold;");
             }
         });
     }
@@ -431,6 +439,7 @@ public class UMLEditorController extends Controller{
         italic.setVisible(b);
         underline.setVisible(b);
         clr.setVisible(b);
+        bold.setVisible(b);
     }
 
     @Override
