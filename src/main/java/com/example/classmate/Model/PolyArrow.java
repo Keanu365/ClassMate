@@ -6,6 +6,8 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
@@ -16,9 +18,13 @@ public class PolyArrow extends Group implements Selectable, Formattable{
 
     private Color strokeColor =  Color.BLACK;
     private double maxOffset = 25;
-    private final UMLBox from;
-    private final UMLBox to;
+    private UMLBox from;
+    private UMLBox to;
 
+    public PolyArrow(String formatStr) {
+        this(new UMLBox(), new UMLBox());
+        this.format(formatStr);
+    }
     public PolyArrow(UMLBox from, UMLBox to){
         this.from = from;
         this.to = to;
@@ -208,10 +214,31 @@ public class PolyArrow extends Group implements Selectable, Formattable{
 
     public void format() {this.updateArrow();}
 
+    public void format(String newFormat) {
+        String[] tokens = newFormat.split("&");
+        Pane contentPane = (Pane) this.getParent();
+        for (Node node :  contentPane.getChildren()) {
+            if (node instanceof UMLBox ub){
+                if (ub.getID() == Integer.parseInt(tokens[1])) this.from = ub;
+                else if (ub.getID() == Integer.parseInt(tokens[2])) this.to = ub;
+            }
+        }
+        String[] colStr = tokens[3].split("-");
+        Double[] color = new Double[]{
+                Double.parseDouble(colStr[0]),
+                Double.parseDouble(colStr[1]),
+                Double.parseDouble(colStr[2]),
+                Double.parseDouble(colStr[3])
+        };
+        this.setStrokeColor(new Color(color[0], color[1], color[2], color[3]));
+        this.setStrokeWidth(Double.parseDouble(tokens[4]));
+        Platform.runLater(this::updateArrow);
+    }
+
     public String getFormat() {
         return String.format("A&%d&%d&%.3f-%.3f-%.3f-%.3f&%.3f",
-                this.from.id,
-                this.to.id,
+                this.from.getID(),
+                this.to.getID(),
                 strokeColor.getRed(), strokeColor.getGreen(), strokeColor.getBlue(), strokeColor.getOpacity(),
                 this.arrow.getStrokeWidth());
     }

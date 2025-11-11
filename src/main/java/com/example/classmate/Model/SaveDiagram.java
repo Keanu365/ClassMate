@@ -42,6 +42,10 @@ public class SaveDiagram{
         bw.close(); //ALWAYS keep this line at the end
     }
 
+    public static void loadCMUD(File file){
+
+    }
+
     private static Bounds getContentBounds(Pane contentPane) {
         double minX = Double.MAX_VALUE;
         double minY = Double.MAX_VALUE;

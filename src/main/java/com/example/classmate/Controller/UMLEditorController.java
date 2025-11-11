@@ -57,7 +57,28 @@ public class UMLEditorController extends Controller{
         contentPane.setPrefSize(10000, 10000);
         SaveDiagram.contentPane = contentPane;
 
-        if (UMLMenuController.umlClasses != null) {
+        if (UMLMenuController.cmudFile != null) {
+            try {
+                Scanner sc = new Scanner(UMLMenuController.cmudFile);
+                int numNodes = sc.nextInt();
+                List<String> umlBoxes = new ArrayList<>();
+                List<String> arrows = new ArrayList<>();
+                for (int i = 0; i < numNodes; i++) {
+                    String formatStr = sc.nextLine();
+                    if (formatStr.startsWith("A")) arrows.add(formatStr);
+                    else if (formatStr.startsWith("B")) umlBoxes.add(formatStr);
+                }
+                for (String formatStr : umlBoxes) {
+                    UMLBox ub = new UMLBox();
+                    contentPane.getChildren().add(ub);
+                    ub.format(formatStr.replace("\\n", "\n"));
+                }
+                for (String formatStr : arrows) {
+                    PolyArrow arrow = new PolyArrow(formatStr);
+                    contentPane.getChildren().add(arrow);
+                }
+            } catch (Exception _) {}
+        }else if (UMLMenuController.umlClasses != null) {
             ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLMenuController.umlClasses));
             double currentTranslateX = 4000 - spacing;
             double currentTranslateY = 5000;

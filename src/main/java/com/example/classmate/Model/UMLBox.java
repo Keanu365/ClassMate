@@ -24,7 +24,8 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     private boolean isInterface = false;
 
     private static int idCounter = 0;
-    public final int id;
+    private int id;
+    public int getID() {return id;}
 
     public UMLBox() {
         this("Name\n", "Fields\n", "Methods\n", idCounter++);
@@ -119,6 +120,35 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
                 textArea.setStyle(start, start + string.length(), style);
             }
         });
+    }
+
+    public void format(String formatStr){
+        String[] tokens = formatStr.split("&");
+        this.id = Integer.parseInt(tokens[1]);
+        String[] colStr = tokens[2].split("-");
+        Double[] color = new Double[]{
+                Double.parseDouble(colStr[0]),
+                Double.parseDouble(colStr[1]),
+                Double.parseDouble(colStr[2]),
+                Double.parseDouble(colStr[3])
+        };
+        this.setFontColor(new Color(color[0], color[1], color[2], color[3]));
+        this.setFontSize(Double.parseDouble(tokens[3]));
+        colStr = tokens[4].split("-");
+        color = new Double[]{
+                Double.parseDouble(colStr[0]),
+                Double.parseDouble(colStr[1]),
+                Double.parseDouble(colStr[2]),
+                Double.parseDouble(colStr[3])
+        };
+        this.setBorderColor(new Color(color[0], color[1], color[2], color[3]));
+        this.setBorderWidth(Double.parseDouble(tokens[5]));
+        this.setTranslateX(Double.parseDouble(tokens[6]));
+        this.setTranslateY(Double.parseDouble(tokens[7]));
+        ((InlineCssTextArea) this.getChildren().getFirst()).replaceText(tokens[8]);
+        ((InlineCssTextArea) this.getChildren().get(1)).replaceText(tokens[9]);
+        ((InlineCssTextArea) this.getChildren().getLast()).replaceText(tokens[10]);
+        Platform.runLater(this::format);
     }
 
     public String getFormat(){
