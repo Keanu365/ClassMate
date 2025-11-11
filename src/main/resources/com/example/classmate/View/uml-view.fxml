@@ -262,6 +262,17 @@
                   <Insets left="30.0" right="30.0" />
                </VBox.margin>
             </Button>
+            <Button fx:id="loadCMUDBtn" layoutX="40.0" layoutY="121.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onMouseClicked="#loadCMUD" style="-fx-background-radius: 15;" styleClass="main_btn" text="Load CMUD">
+               <font>
+                  <Font name="Ink Free" size="18.0" />
+               </font>
+               <effect>
+                  <InnerShadow />
+               </effect>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
          </children>
       </VBox>
    </children>

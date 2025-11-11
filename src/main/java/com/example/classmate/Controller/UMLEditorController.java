@@ -51,13 +51,42 @@ public class UMLEditorController extends Controller{
 
     @FXML
     public void initialize(){
+        System.out.println("INIT");
         scrollPane.widthProperty().addListener((_, _, _) -> scrollPane.setPrefWidth(((Pane) scrollPane.getParent()).getWidth() - 150));
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
         contentPane.setPrefSize(10000, 10000);
         SaveDiagram.contentPane = contentPane;
 
-        if (UMLMenuController.umlClasses != null) {
+        if (UMLMenuController.cmudFile != null) {
+            try {
+                Scanner sc = new Scanner(UMLMenuController.cmudFile);
+                int numNodes = Integer.parseInt(sc.nextLine());
+                List<String> umlBoxes = new ArrayList<>();
+                List<String> arrows = new ArrayList<>();
+                for (int i = 0; i < numNodes; i++) {
+                    String formatStr = sc.nextLine();
+                    System.out.println(formatStr);
+                    if (formatStr.startsWith("A")) {
+                        arrows.add(formatStr);
+                        System.out.println("Found an Arrow");
+                    }
+                    else if (formatStr.startsWith("B")) umlBoxes.add(formatStr);
+                }
+                for (String formatStr : umlBoxes) {
+                    System.out.println("FORMATTING...");
+                    UMLBox ub = new UMLBox();
+                    contentPane.getChildren().add(ub);
+                    ub.format(formatStr.replace("\\n", "\n"));
+                }
+                for (String formatStr : arrows) {
+                    System.out.println("FORMATTING... " + formatStr);
+                    PolyArrow arrow = new PolyArrow();
+                    contentPane.getChildren().add(arrow);
+                    arrow.format(formatStr);
+                }
+            } catch (Exception e) {e.printStackTrace();}
+        }else if (UMLMenuController.umlClasses != null) {
             ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLMenuController.umlClasses));
             double currentTranslateX = 4000 - spacing;
             double currentTranslateY = 5000;
