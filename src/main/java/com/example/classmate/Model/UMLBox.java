@@ -12,10 +12,15 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.fxmisc.richtext.InlineCssTextArea;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
+
+
+    private static List<InlineCssTextArea> allAreas = new ArrayList<>();
+
     public Color fontColor = Color.BLACK;
     public double fontSize = 12;
     public Color borderColor = Color.BLACK;
@@ -30,6 +35,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     public UMLBox() {
         this("Name\n", "Fields\n", "Methods\n", idCounter++);
     }
+
     public UMLBox(UMLClass uc){
         this(uc.getName(), uc.getFields(), uc.getMethods(), idCounter++);
         isInterface = uc.getUMLClass().isInterface();
@@ -50,6 +56,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
         String[] texts = new String[]{name, fields, methods};
         for (String text : texts) {
             InlineCssTextArea textArea = new InlineCssTextArea();
+            allAreas.add(textArea);
             textArea.replaceText(text);
             textArea.getStyleClass().add("uml_label");
             textArea.setStyle("-fx-font-size: 12px;");
@@ -85,23 +92,33 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     List<String> fieldsToUnderline = new ArrayList<>();
     List<String> methodsToUnderline = new ArrayList<>();
     List<String> methodsToItalicise = new ArrayList<>();
+
     public void format(){
         for (Node node : this.getChildren()){
             //Format inside InlineCSSTextArea
             List<String> toUnderline;
             if (node.equals(this.getChildren().get(1))) toUnderline = fieldsToUnderline;
             else toUnderline = methodsToUnderline;
+
             InlineCssTextArea textArea = (InlineCssTextArea) node;
+
+
             textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false; -fx-font-style: normal;");
+
             if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
             if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
+
             //Format other things
             this.setFontColor(this.fontColor);
             this.setFontSize(this.fontSize);
             this.setBorderColor(this.borderColor);
             this.setBorderWidth(this.borderWidth);
+
         }
     }
+
+
+
     private void formatHelper(InlineCssTextArea textArea, List<String> toFormat, String matchStr, String matchRegex, String style){
         Platform.runLater(() -> {
             while (textArea.getText().contains(matchStr)) {
@@ -121,6 +138,22 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
             }
         });
     }
+
+    public static void formatSelected(InlineCssTextArea textArea, String style){
+        Platform.runLater(() -> {
+            String matchStr = textArea.getSelectedText();
+            int start = textArea.getText().indexOf(matchStr);
+            int end = start + matchStr.length();
+            textArea.setStyle(start, start + matchStr.length(), style);
+        });
+    }
+
+
+    public static InlineCssTextArea[] getAllAreas() {
+        return allAreas.toArray(new InlineCssTextArea[0]);
+    }
+
+
 
     public void format(String formatStr){
         String[] tokens = formatStr.split("&");
@@ -210,6 +243,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     private double mouseX = 0;
     private boolean resizing = false;
     private double anchorX = 0;
+
     public void resize(){
         //Since height is auto-calibrated, this method will only support width resizing.
         //Of course, if more time was given, height resizing would have been implemented.
@@ -289,6 +323,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
         );
         this.setBorder(new Border(borderStroke));
     }
+
 
     public enum Midpoint {
         TOP,

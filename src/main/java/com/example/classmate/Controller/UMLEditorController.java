@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import org.fxmisc.richtext.InlineCssTextArea;
 
 import java.io.*;
 import java.util.*;
@@ -44,6 +45,11 @@ public class UMLEditorController extends Controller{
     @FXML private ToggleButton panToggle;
     @FXML private ToggleButton editTextToggle;
     @FXML private ToggleButton resizeToggle;
+
+    @FXML private Button italic;
+    @FXML private Button underline;
+    @FXML private Button clr;
+
     private final ArrayList<ToggleButton> modeToggles = new ArrayList<>(5);
 
     EditMode editMode;
@@ -141,6 +147,28 @@ public class UMLEditorController extends Controller{
         editMode = EditMode.SELECT;
         selectToggle.setSelected(true);
         setEditMode(editMode);
+
+
+        underline.setOnAction( e -> {
+            InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
+            for(InlineCssTextArea textArea:inlineCssTextAreas) {
+                UMLBox.formatSelected(textArea, "-fx-underline:true;");
+            }
+        });
+
+        italic.setOnAction( e -> {
+            InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
+            for(InlineCssTextArea textArea:inlineCssTextAreas) {
+                UMLBox.formatSelected(textArea, "-fx-font-style:italic;");
+            }
+        });
+
+        clr.setOnAction(e -> {
+            InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
+            for(InlineCssTextArea textArea:inlineCssTextAreas) {
+                UMLBox.formatSelected(textArea, "-fx-underline: false; -fx-font-style: normal;");
+            }
+        });
     }
 
     private void addParentUMLBox(UMLBox parent, UMLBox child, double translateX){
@@ -184,6 +212,8 @@ public class UMLEditorController extends Controller{
             showAlert(Alert.AlertType.ERROR, "ClassMate - Save Error", "Error in saving file", e.getMessage(), false);
         }
     }
+
+
 
     @FXML
     private void drawArrow() {
@@ -299,22 +329,31 @@ public class UMLEditorController extends Controller{
 
     private void setEditMode(EditMode editMode){
         switch(editMode){
-            case SELECT:
+            case SELECT->{
+                setTextEditorVisibility(false);
                 scrollPane.setCursor(Cursor.DEFAULT);
-                modeChanger(false, false, false, true, false); break;
-            case MOVE:
+                modeChanger(false, false, false, true, false);
+            }
+            case MOVE -> {
+                setTextEditorVisibility(false);
                 scrollPane.setCursor(Cursor.MOVE);
-                modeChanger(false, true, false, false, false); break;
-            case PAN:
+                modeChanger(false, true, false, false, false);
+            }
+            case PAN -> {
+                setTextEditorVisibility(false);
                 scrollPane.setCursor(Cursor.OPEN_HAND);
-                modeChanger(true, false, false, false, false); break;
-            case EDIT_TEXT:
+                modeChanger(true, false, false, false, false);
+            }
+            case EDIT_TEXT -> {
+                setTextEditorVisibility(true);
                 scrollPane.setCursor(Cursor.TEXT);
-                modeChanger(true, false, true, false, false); break;
-            case RESIZE:
+                modeChanger(true, false, true, false, false);
+            }
+            case RESIZE -> {
+                setTextEditorVisibility(false);
                 scrollPane.setCursor(Cursor.DEFAULT);
                 modeChanger(false, false, false, true, true);
-            default: break;
+            }
         }
     }
     private void modeChanger(boolean pannable, boolean draggable, boolean editable, boolean selectable, boolean resizable){
@@ -415,6 +454,11 @@ public class UMLEditorController extends Controller{
                 ((Pane) node.getParent()).getChildren().remove(ub.arrow);
             }
         }
+    }
+
+    void setTextEditorVisibility(boolean b) {
+        italic.setVisible(b);
+        underline.setVisible(b);
     }
 
     @Override
