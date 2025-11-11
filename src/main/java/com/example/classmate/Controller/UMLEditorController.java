@@ -37,8 +37,8 @@ public class UMLEditorController extends Controller{
     @FXML private TextField borderWidthField;
     @FXML private ColorPicker fontColorPicker;
     @FXML private TextField fontSizeField;
-    @FXML private VBox propBox1;
-    @FXML private VBox propBox2;
+    @FXML private HBox propBox1;
+    @FXML private HBox propBox2;
     @FXML private Label propertiesLbl;
     @FXML private ToggleButton selectToggle;
     @FXML private ToggleButton moveToggle;
@@ -430,6 +430,7 @@ public class UMLEditorController extends Controller{
     void setTextEditorVisibility(boolean b) {
         italic.setVisible(b);
         underline.setVisible(b);
+        clr.setVisible(b);
     }
 
     @Override

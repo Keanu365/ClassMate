@@ -102,73 +102,6 @@
                               <Font size="18.0" />
                            </font>
                         </Label>
-                        <VBox fx:id="propBox1" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
-                           <children>
-                              <Button fx:id="delBtn" mnemonicParsing="false">
-                                 <graphic>
-                                    <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
-                                       <image>
-                                          <Image url="@delete.png" />
-                                       </image>
-                                    </ImageView>
-                                 </graphic>
-                              </Button>
-                              <Label styleClass="label1" text="Border/Stroke Color:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <ColorPicker fx:id="borderColorPicker" minHeight="-Infinity">
-                                 <value>
-                                    <Color />
-                                 </value>
-                              </ColorPicker>
-                              <Label layoutX="47.0" layoutY="45.0" styleClass="label1" text="Border/Stroke Width:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
-                                 <children>
-                                    <TextField fx:id="borderWidthField" prefWidth="30.0" />
-                                    <Label style="-fx-text-fill: white;" text="px">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
-                        <VBox fx:id="propBox2" alignment="TOP_CENTER" layoutX="10.0" layoutY="338.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
-                           <children>
-                              <Label styleClass="label1" text="Font Color:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <ColorPicker fx:id="fontColorPicker" minHeight="-Infinity">
-                                 <value>
-                                    <Color />
-                                 </value>
-                              </ColorPicker>
-                              <Label styleClass="label1" text="Font Size:">
-                                 <font>
-                                    <Font size="14.0" />
-                                 </font>
-                              </Label>
-                              <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
-                                 <children>
-                                    <TextField fx:id="fontSizeField" prefWidth="30.0" />
-                                    <Label style="-fx-text-fill: white;" text="px">
-                                       <font>
-                                          <Font size="14.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                              </HBox>
-                           </children>
-                        </VBox>
                      </children>
                   </VBox>
                </children>
@@ -230,6 +163,73 @@
                   <Font name="Arial" size="18.0" />
                </font>
             </Button>
+            <HBox fx:id="propBox1" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
+               <children>
+                  <Button fx:id="delBtn" mnemonicParsing="false">
+                     <graphic>
+                        <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@delete.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Label styleClass="label1" text="Border/Stroke Color:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ColorPicker fx:id="borderColorPicker" minHeight="-Infinity">
+                     <value>
+                        <Color />
+                     </value>
+                  </ColorPicker>
+                  <Label layoutX="47.0" layoutY="45.0" styleClass="label1" text="Border/Stroke Width:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                     <children>
+                               <TextField fx:id="borderWidthField" prefWidth="30.0" />
+                        <Label style="-fx-text-fill: white;" text="px">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+            <HBox fx:id="propBox2" alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" visible="false">
+               <children>
+                  <Label styleClass="label1" text="Font Color:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <ColorPicker fx:id="fontColorPicker" minHeight="-Infinity">
+                     <value>
+                        <Color />
+                     </value>
+                  </ColorPicker>
+                  <Label styleClass="label1" text="Font Size:">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="5.0">
+                     <children>
+                        <TextField fx:id="fontSizeField" prefWidth="30.0" />
+                        <Label style="-fx-text-fill: white;" text="px">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
          </children>
          <GridPane.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
