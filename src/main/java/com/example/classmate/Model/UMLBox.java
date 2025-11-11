@@ -104,9 +104,9 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
 
 
             textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false; -fx-font-style: normal;");
-
-            if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
-            if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
+//
+//            if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
+//            if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
 
             //Format other things
             this.setFontColor(this.fontColor);
