@@ -28,17 +28,21 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
     public PolyArrow arrow = null;
     private boolean isInterface = false;
 
+    private static int idCounter = 0;
+    private int id;
+    public int getID() {return id;}
+
     public UMLBox() {
-        this("Name\n", "Fields\n", "Methods\n");
+        this("Name\n", "Fields\n", "Methods\n", idCounter++);
     }
 
     public UMLBox(UMLClass uc){
-        this(uc.getName(), uc.getFields(), uc.getMethods());
+        this(uc.getName(), uc.getFields(), uc.getMethods(), idCounter++);
         isInterface = uc.getUMLClass().isInterface();
     }
-
-    public UMLBox(String name, String fields, String methods) {
+    public UMLBox(String name, String fields, String methods, int id) {
         super();
+        this.id = id;
         //Border stuff :3
         BorderStroke borderStroke = new BorderStroke(
                 Color.BLACK,                      // stroke color
@@ -151,15 +155,54 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
 
 
 
+    public void format(String formatStr){
+        String[] tokens = formatStr.split("&");
+        this.id = Integer.parseInt(tokens[1]);
+        String[] colStr = tokens[2].split("-");
+        Double[] color = new Double[]{
+                Double.parseDouble(colStr[0]),
+                Double.parseDouble(colStr[1]),
+                Double.parseDouble(colStr[2]),
+                Double.parseDouble(colStr[3])
+        };
+        this.setFontColor(new Color(color[0], color[1], color[2], color[3]));
+        this.setFontSize(Double.parseDouble(tokens[3]));
+        colStr = tokens[4].split("-");
+        color = new Double[]{
+                Double.parseDouble(colStr[0]),
+                Double.parseDouble(colStr[1]),
+                Double.parseDouble(colStr[2]),
+                Double.parseDouble(colStr[3])
+        };
+        this.setBorderColor(new Color(color[0], color[1], color[2], color[3]));
+        this.setBorderWidth(Double.parseDouble(tokens[5]));
+        this.setTranslateX(Double.parseDouble(tokens[6]));
+        this.setTranslateY(Double.parseDouble(tokens[7]));
+        ((InlineCssTextArea) this.getChildren().getFirst()).replaceText(tokens[8]);
+        ((InlineCssTextArea) this.getChildren().get(1)).replaceText(tokens[9]);
+        ((InlineCssTextArea) this.getChildren().getLast()).replaceText(tokens[10]);
+        Platform.runLater(this::format);
+    }
+
     public String getFormat(){
-        return String.format("%f-%f-%f-%f&%f&%f-%f-%f-%f&%f&%s&%s&%s",
+        String name = ((InlineCssTextArea) this.getChildren().getFirst()).getText();
+        String fields = ((InlineCssTextArea) this.getChildren().get(1)).getText();
+        String methods = ((InlineCssTextArea) this.getChildren().getLast()).getText();
+        return String.format("B&%d&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f&%.3f&%s&%s&%s",// &Attribute, - is secondary delimiter
+                this.id,
                 fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getOpacity(),
                 fontSize,
                 borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), borderColor.getOpacity(),
                 borderWidth,
-                fieldsToUnderline,
-                methodsToUnderline,
-                methodsToItalicise);
+                this.getTranslateX(),
+                this.getTranslateY(),
+                textHelper(name),
+                textHelper(fields),
+                textHelper(methods));
+        //Must change this to include formatting
+    }
+    private String textHelper(String string){
+        return (string.length() <= 1 ? string : string.substring(0, string.length() - 1).replace("\n", "\\n"));
     }
 
     public boolean isInterface(){return this.isInterface;}

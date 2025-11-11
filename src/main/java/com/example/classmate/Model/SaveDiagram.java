@@ -35,17 +35,15 @@ public class SaveDiagram{
         if (contentPane.getChildren().isEmpty()) throw new IllegalArgumentException();
         FileWriter fw = new FileWriter(outputFile);
         BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(contentPane.getChildren().size() + "");
-        //Using | as a future delimiter
+        bw.write(contentPane.getChildren().size() + "\n");
         for (Node node : contentPane.getChildren()) {
-            String toWrite = "";
-            if (node instanceof UMLBox ub) {
-                //TODO: b|PosX|PosY|Width|Height|Name|Fields|Methods|Formatting
-            }else if (node instanceof PolyArrow arrow) {
-                //TODO: a|
-            }
+            if (node instanceof Formattable fNode) bw.write(fNode.getFormat() + "\n");
         }
         bw.close(); //ALWAYS keep this line at the end
+    }
+
+    public static void loadCMUD(File file){
+
     }
 
     private static Bounds getContentBounds(Pane contentPane) {
