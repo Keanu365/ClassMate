@@ -167,7 +167,10 @@ public class UMLEditorController extends Controller{
         clr.setOnAction(e -> {
             InlineCssTextArea[] inlineCssTextAreas = UMLBox.getAllAreas();
             for(InlineCssTextArea textArea:inlineCssTextAreas) {
-                UMLBox.formatSelected(textArea, "-fx-underline: false; -fx-font-style: normal; -fx-font-weight:normal;");
+                UMLBox.formatSelected(textArea, "-fx-underline: false; -fx-font-style: normal; -fx-font-weight:normal; " + String.format("-fx-fill: rgb(%d,%d,%d);",
+                        (int)(((UMLBox) textArea.getParent()).fontColor.getRed() * 255),
+                        (int)(((UMLBox) textArea.getParent()).fontColor.getGreen() * 255),
+                        (int)(((UMLBox) textArea.getParent()).fontColor.getBlue() * 255)));
             }
         });
 

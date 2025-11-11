@@ -76,11 +76,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
             if (this.getChildren().isEmpty()) {//i.e. title text area
                 textArea.textProperty().addListener((_, _, _) ->
                         this.isInterface = textArea.getText().startsWith("<<interface>>"));
-            } else textArea.setOnKeyPressed(keyEvent -> {
-                if (keyEvent.getCode() == KeyCode.ENTER) {
-                    this.format();
-                }
-            });
+            }
             this.getChildren().add(textArea);
             Platform.runLater(this::format);
         }
@@ -105,7 +101,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
             String matchStr = textArea.getSelectedText();
             int start = textArea.getText().indexOf(matchStr);
             int end = start + matchStr.length();
-            textArea.setStyle(start, end, style + textArea.getStyleAtPosition(start));
+            textArea.setStyle(start, end, style);
         });
     }
 
