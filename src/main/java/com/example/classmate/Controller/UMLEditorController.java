@@ -51,6 +51,7 @@ public class UMLEditorController extends Controller{
 
     @FXML
     public void initialize(){
+        System.out.println("INIT");
         scrollPane.widthProperty().addListener((_, _, _) -> scrollPane.setPrefWidth(((Pane) scrollPane.getParent()).getWidth() - 150));
         DraggableMaker dm = new DraggableMaker();
         dm.makeDraggable(umlBoxLbl, true);
@@ -60,24 +61,31 @@ public class UMLEditorController extends Controller{
         if (UMLMenuController.cmudFile != null) {
             try {
                 Scanner sc = new Scanner(UMLMenuController.cmudFile);
-                int numNodes = sc.nextInt();
+                int numNodes = Integer.parseInt(sc.nextLine());
                 List<String> umlBoxes = new ArrayList<>();
                 List<String> arrows = new ArrayList<>();
                 for (int i = 0; i < numNodes; i++) {
                     String formatStr = sc.nextLine();
-                    if (formatStr.startsWith("A")) arrows.add(formatStr);
+                    System.out.println(formatStr);
+                    if (formatStr.startsWith("A")) {
+                        arrows.add(formatStr);
+                        System.out.println("Found an Arrow");
+                    }
                     else if (formatStr.startsWith("B")) umlBoxes.add(formatStr);
                 }
                 for (String formatStr : umlBoxes) {
+                    System.out.println("FORMATTING...");
                     UMLBox ub = new UMLBox();
                     contentPane.getChildren().add(ub);
                     ub.format(formatStr.replace("\\n", "\n"));
                 }
                 for (String formatStr : arrows) {
-                    PolyArrow arrow = new PolyArrow(formatStr);
+                    System.out.println("FORMATTING... " + formatStr);
+                    PolyArrow arrow = new PolyArrow();
                     contentPane.getChildren().add(arrow);
+                    arrow.format(formatStr);
                 }
-            } catch (Exception _) {}
+            } catch (Exception e) {e.printStackTrace();}
         }else if (UMLMenuController.umlClasses != null) {
             ArrayList<UMLClass> umlClasses = new ArrayList<>(List.of(UMLMenuController.umlClasses));
             double currentTranslateX = 4000 - spacing;

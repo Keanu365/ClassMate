@@ -12,6 +12,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 
+import java.util.Arrays;
+
 public class PolyArrow extends Group implements Selectable, Formattable{
     private final Polyline arrow = new Polyline();
     private final Polygon arrowHead = new Polygon();
@@ -21,34 +23,21 @@ public class PolyArrow extends Group implements Selectable, Formattable{
     private UMLBox from;
     private UMLBox to;
 
-    public PolyArrow(String formatStr) {
-        this(new UMLBox(), new UMLBox());
-        this.format(formatStr);
-    }
-    public PolyArrow(UMLBox from, UMLBox to){
-        this.from = from;
-        this.to = to;
-        from.arrow = this;
-        to.arrow = this;
+    public PolyArrow() {
         this.getChildren().addAll(arrow, arrowHead);
         arrowHead.getPoints().addAll(0.0, 0.0,
                 -16.0, -8.0,
                 -16.0,  8.0);
         this.arrow.setStrokeWidth(3.0);
         this.arrow.setStroke(strokeColor);
-        if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().addAll(1.0, 8.0);
-        else if (!to.isInterface() && from.isInterface()) throw new IllegalArgumentException("Interfaces cannot extend non-interfaces!");
-        this.arrowHead.setStyle("-fx-background-color: black;");
+    }
+    public PolyArrow(UMLBox from, UMLBox to){
+        this();
+        this.from = from;
+        this.to = to;
+        from.arrow = this;
+        to.arrow = this;
         this.updateArrow();
-        ReadOnlyDoubleProperty[] properties = new ReadOnlyDoubleProperty[]{
-                from.translateXProperty(), from.translateYProperty(),
-                to.translateXProperty(), to.translateYProperty(),
-                from.widthProperty(), from.heightProperty(),
-                to.widthProperty(), to.heightProperty(),
-        };
-        for (ReadOnlyDoubleProperty property : properties) {
-            property.addListener((_, _, _) -> this.updateArrow());
-        }
     }
 
     public void setSelectable(boolean selectable){
@@ -101,6 +90,15 @@ public class PolyArrow extends Group implements Selectable, Formattable{
             arrowHead.setScaleY(this.arrow.getStrokeWidth() / 3.0);
             if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().setAll(1.0, 8.0);
             else this.arrow.getStrokeDashArray().setAll();
+            ReadOnlyDoubleProperty[] properties = new ReadOnlyDoubleProperty[]{
+                from.translateXProperty(), from.translateYProperty(),
+                to.translateXProperty(), to.translateYProperty(),
+                from.widthProperty(), from.heightProperty(),
+                to.widthProperty(), to.heightProperty(),
+            };
+            for (ReadOnlyDoubleProperty property : properties) {
+                property.addListener((_, _, _) -> this.updateArrow());
+            }
         });
     }
 
@@ -215,8 +213,11 @@ public class PolyArrow extends Group implements Selectable, Formattable{
     public void format() {this.updateArrow();}
 
     public void format(String newFormat) {
+        System.out.println("formatting... " + newFormat);
         String[] tokens = newFormat.split("&");
+        System.out.println(Arrays.toString(tokens));
         Pane contentPane = (Pane) this.getParent();
+        if (this.from != null || this.to != null) this.detach();
         for (Node node :  contentPane.getChildren()) {
             if (node instanceof UMLBox ub){
                 if (ub.getID() == Integer.parseInt(tokens[1])) this.from = ub;
@@ -232,7 +233,7 @@ public class PolyArrow extends Group implements Selectable, Formattable{
         };
         this.setStrokeColor(new Color(color[0], color[1], color[2], color[3]));
         this.setStrokeWidth(Double.parseDouble(tokens[4]));
-        Platform.runLater(this::updateArrow);
+        this.updateArrow();
     }
 
     public String getFormat() {
