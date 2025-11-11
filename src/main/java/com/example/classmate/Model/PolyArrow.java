@@ -62,7 +62,20 @@ public class PolyArrow extends Group implements Selectable, Formattable{
     public void setStrokeWidth(double width){
         this.arrow.setStrokeWidth(width);
         this.maxOffset *= width / 3.0;
+        this.addListeners();
         this.updateArrow();
+    }
+
+    private void addListeners(){
+        ReadOnlyDoubleProperty[] properties = new ReadOnlyDoubleProperty[]{
+                from.translateXProperty(), from.translateYProperty(),
+                to.translateXProperty(), to.translateYProperty(),
+                from.widthProperty(), from.heightProperty(),
+                to.widthProperty(), to.heightProperty(),
+        };
+        for (ReadOnlyDoubleProperty property : properties) {
+            property.addListener((_, _, _) -> this.updateArrow());
+        }
     }
 
     public void updateArrow() {
@@ -90,15 +103,6 @@ public class PolyArrow extends Group implements Selectable, Formattable{
             arrowHead.setScaleY(this.arrow.getStrokeWidth() / 3.0);
             if (to.isInterface() && !from.isInterface()) this.arrow.getStrokeDashArray().setAll(1.0, 8.0);
             else this.arrow.getStrokeDashArray().setAll();
-            ReadOnlyDoubleProperty[] properties = new ReadOnlyDoubleProperty[]{
-                from.translateXProperty(), from.translateYProperty(),
-                to.translateXProperty(), to.translateYProperty(),
-                from.widthProperty(), from.heightProperty(),
-                to.widthProperty(), to.heightProperty(),
-            };
-            for (ReadOnlyDoubleProperty property : properties) {
-                property.addListener((_, _, _) -> this.updateArrow());
-            }
         });
     }
 
@@ -210,8 +214,6 @@ public class PolyArrow extends Group implements Selectable, Formattable{
         return this.from == currentTo;
     }
 
-    public void format() {this.updateArrow();}
-
     public void format(String newFormat) {
         System.out.println("formatting... " + newFormat);
         String[] tokens = newFormat.split("&");
@@ -233,6 +235,7 @@ public class PolyArrow extends Group implements Selectable, Formattable{
         };
         this.setStrokeColor(new Color(color[0], color[1], color[2], color[3]));
         this.setStrokeWidth(Double.parseDouble(tokens[4]));
+        this.addListeners();
         this.updateArrow();
     }
 

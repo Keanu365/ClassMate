@@ -11,15 +11,19 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.fxmisc.richtext.InlineCssTextArea;
+import org.fxmisc.richtext.model.StyleSpans;
+import org.fxmisc.richtext.model.StyleSpan;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
 
 
-    private static List<InlineCssTextArea> allAreas = new ArrayList<>();
+    private static final List<InlineCssTextArea> allAreas = new ArrayList<>();
 
     public Color fontColor = Color.BLACK;
     public double fontSize = 12;
@@ -89,54 +93,11 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
         this.prefHeightProperty().bind(properties[0].add(properties[1]).add(properties[2]));
     }
 
-    List<String> fieldsToUnderline = new ArrayList<>();
-    List<String> methodsToUnderline = new ArrayList<>();
-    List<String> methodsToItalicise = new ArrayList<>();
-
-    public void format(){
-        for (Node node : this.getChildren()){
-            //Format inside InlineCSSTextArea
-            List<String> toUnderline;
-            if (node.equals(this.getChildren().get(1))) toUnderline = fieldsToUnderline;
-            else toUnderline = methodsToUnderline;
-
-            InlineCssTextArea textArea = (InlineCssTextArea) node;
-
-
-            textArea.setStyle(0, textArea.getText().length(), "-fx-underline: false; -fx-font-style: normal;");
-//
-//            if (!node.equals(this.getChildren().getFirst())) formatHelper(textArea, toUnderline, "{s}", "\\{s}", "-fx-underline: true");
-//            if (!node.equals(this.getChildren().get(1))) formatHelper(textArea, methodsToItalicise, "{a}", "\\{a}", "-fx-font-style: italic;");
-
-            //Format other things
-            this.setFontColor(this.fontColor);
-            this.setFontSize(this.fontSize);
-            this.setBorderColor(this.borderColor);
-            this.setBorderWidth(this.borderWidth);
-
-        }
-    }
-
-
-
-    private void formatHelper(InlineCssTextArea textArea, List<String> toFormat, String matchStr, String matchRegex, String style){
-        Platform.runLater(() -> {
-            while (textArea.getText().contains(matchStr)) {
-                int start = textArea.getText().indexOf(matchStr);
-                textArea.replaceText(textArea.getText().replaceFirst(matchRegex, ""));
-                int end = textArea.getText().indexOf(matchStr, start);
-                textArea.replaceText(textArea.getText().replaceFirst(matchRegex, ""));
-                toFormat.add(textArea.getText().substring(start, end));
-            }
-            for (String string : toFormat) {
-                int start = textArea.getText().indexOf(string);
-                if (start == -1) {
-                    toFormat.remove(string);
-                    continue;
-                }
-                textArea.setStyle(start, start + string.length(), style);
-            }
-        });
+    public void format() {
+        this.setFontColor(this.fontColor);
+        this.setFontSize(this.fontSize);
+        this.setBorderColor(this.borderColor);
+        this.setBorderWidth(this.borderWidth);
     }
 
     public static void formatSelected(InlineCssTextArea textArea, String style){
@@ -144,7 +105,7 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
             String matchStr = textArea.getSelectedText();
             int start = textArea.getText().indexOf(matchStr);
             int end = start + matchStr.length();
-            textArea.setStyle(start, start + matchStr.length(), style);
+            textArea.setStyle(start, end, style + textArea.getStyleAtPosition(start));
         });
     }
 
@@ -156,6 +117,10 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
 
 
     public void format(String formatStr){
+        InlineCssTextArea nameArea = (InlineCssTextArea) this.getChildren().get(0);
+        InlineCssTextArea fieldsArea = (InlineCssTextArea) this.getChildren().get(1);
+        InlineCssTextArea methodsArea = (InlineCssTextArea) this.getChildren().get(2);
+
         String[] tokens = formatStr.split("&");
         this.id = Integer.parseInt(tokens[1]);
         String[] colStr = tokens[2].split("-");
@@ -178,17 +143,27 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
         this.setBorderWidth(Double.parseDouble(tokens[5]));
         this.setTranslateX(Double.parseDouble(tokens[6]));
         this.setTranslateY(Double.parseDouble(tokens[7]));
-        ((InlineCssTextArea) this.getChildren().getFirst()).replaceText(tokens[8]);
-        ((InlineCssTextArea) this.getChildren().get(1)).replaceText(tokens[9]);
-        ((InlineCssTextArea) this.getChildren().getLast()).replaceText(tokens[10]);
-        Platform.runLater(this::format);
+        styleHelper(nameArea, tokens[8], tokens[9]);
+        styleHelper(fieldsArea, tokens[10], tokens[11]);
+        styleHelper(methodsArea, tokens[12], tokens[13]);
+    }
+    private void styleHelper(InlineCssTextArea area, String text, String style){
+        area.replaceText(text);
+        Platform.runLater(() -> {
+            String[] styles = style.split("\\|");
+            for (String s : styles) {
+                String[] styleArr = s.split("/");
+                area.setStyle(Integer.parseInt(styleArr[0]), Integer.parseInt(styleArr[1]), styleArr[2] + area.getStyleAtPosition(Integer.parseInt(styleArr[0])));
+                System.out.println(Arrays.toString(styleArr));
+            }
+        });
     }
 
     public String getFormat(){
-        String name = ((InlineCssTextArea) this.getChildren().getFirst()).getText();
-        String fields = ((InlineCssTextArea) this.getChildren().get(1)).getText();
-        String methods = ((InlineCssTextArea) this.getChildren().getLast()).getText();
-        return String.format("B&%d&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f&%.3f&%s&%s&%s",// &Attribute, - is secondary delimiter
+        InlineCssTextArea nameArea = (InlineCssTextArea) this.getChildren().get(0);
+        InlineCssTextArea fieldsArea = (InlineCssTextArea) this.getChildren().get(1);
+        InlineCssTextArea methodsArea = (InlineCssTextArea) this.getChildren().get(2);
+        return String.format("B&%d&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f-%.3f-%.3f-%.3f&%.3f&%.3f&%.3f&%s&%s&%s&%s&%s&%s",// &Attribute, - is secondary delimiter
                 this.id,
                 fontColor.getRed(), fontColor.getGreen(), fontColor.getBlue(), fontColor.getOpacity(),
                 fontSize,
@@ -196,13 +171,44 @@ public class UMLBox extends VBox implements Selectable, Resizable, Formattable {
                 borderWidth,
                 this.getTranslateX(),
                 this.getTranslateY(),
-                textHelper(name),
-                textHelper(fields),
-                textHelper(methods));
-        //Must change this to include formatting
+                textHelper(nameArea.getText()),
+                getStyleString(nameArea),
+                textHelper(fieldsArea.getText()),
+                getStyleString(fieldsArea),
+                textHelper(methodsArea.getText()),
+                getStyleString(methodsArea));
     }
     private String textHelper(String string){
         return (string.length() <= 1 ? string : string.substring(0, string.length() - 1).replace("\n", "\\n"));
+    }
+    private String getStyleString(InlineCssTextArea textArea){
+        StyleSpans<String> spans = textArea.getStyleSpans(0, textArea.getLength());
+        StringBuilder builder = new StringBuilder();
+
+        int index = 0;
+        for (StyleSpan<String> span : spans) {
+            String style = span.getStyle();
+            if (style != null && !style.trim().isEmpty()) {
+                int start = index;
+                int end = index + span.getLength();
+
+                // Format: start/end/style|
+                builder.append(start)
+                        .append("/")
+                        .append(end)
+                        .append("/")
+                        .append(style.trim().replace("|", "\\|")) // escape any accidental pipes
+                        .append("|");
+            }
+            index += span.getLength();
+        }
+
+        // Remove trailing pipe if it exists
+        if (!builder.isEmpty() && builder.charAt(builder.length() - 1) == '|') {
+            builder.deleteCharAt(builder.length() - 1);
+        }
+
+        return builder.toString();
     }
 
     public boolean isInterface(){return this.isInterface;}
